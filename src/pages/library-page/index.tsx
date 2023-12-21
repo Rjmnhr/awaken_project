@@ -60,7 +60,7 @@ const LibraryPage: React.FC = () => {
                   }}
                 >
                     <div className="w-100 " style={{height:"5px",backgroundColor: "rgba(71, 209, 195, 0.6)"}}></div>
-                  <h2 className="w-100 mt-1 mb-1" style={{backgroundColor: "rgba(71, 209, 195, 0.6)", }}>Mid Life Journey</h2>
+                  <h2 className="w-100 mt-1 mb-1" style={{backgroundColor: "rgba(71, 209, 195, 0.6)", }}>Mid Life Evolution</h2>
                   <div style={{height:"5px",backgroundColor: "rgba(71, 209, 195, 0.6)", }}></div>
                 </div>
               </div>
