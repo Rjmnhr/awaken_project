@@ -7,6 +7,11 @@
   pointer-events: none;
 }
 
+.ant-input-affix-wrapper {
+  border-radius: 0px !important;
+  height: 50px;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
@@ -34,9 +39,9 @@
   border: none;
 }
 .card-container {
-  position: relative;
+
   display: flex;
-  flex-direction: column;
+
   align-items: center;
   text-align: center;
 }
@@ -47,14 +52,64 @@
 }
 
 
-.card-container h3 {
+/* .card-container h3 {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   margin: 0; /* Remove default margin to ensure accurate centering */
-  color:white
+  
+ */
+.hover-card{
+  color:black
 }
+
+.hover-card:hover{
+  background: #47d1c3!important;
+  color: white;
+  cursor: pointer;
+
+}
+.check-tick{
+color:black;
+}
+.check-tick:hover{
+  color: white;
+}
+.active{
+  background: #47d1c3!important;
+  color: white;
+
+}
+
+.btn-not-completed{
+  border:3px solid #47d1c3 !important;
+  color: #0a7f73;
+border-radius: none !important;
+}
+.btn-completed{
+  border:3px solid #47d1c3 !important;
+background: #47d1c3 ;
+color: white;
+border-radius: none !important;
+}
+
+.btn-completed:hover{
+  border:3px solid #7be1d7 !important;
+background: #7be1d7 ;
+color: white;
+border-radius: none !important;
+}
+
+
+.btn-not-completed:hover{
+  border:3px solid #0a7f73 !important;
+
+  color: #0a7f73;
+
+}
+
+
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
