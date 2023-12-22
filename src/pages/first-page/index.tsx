@@ -63,7 +63,7 @@ navigate("/")
 
 
   const sideBarTabs = [
-    <a href="/">Introduction</a>,
+    <a href="/mid-life-journey">Introduction</a>,
     <a style={{color:"black"}} href="/account">Settings</a>,
   <p onClick={handleLogOut} style={{color:"black"}} >Logout</p>,
    
