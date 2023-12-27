@@ -1,3 +1,4 @@
+
 .App {
   text-align: center;
 }
@@ -10,6 +11,29 @@
 .ant-input-affix-wrapper {
   border-radius: 0px !important;
   height: 50px;
+}
+
+.ant-collapse-ghost >.ant-collapse-item >.ant-collapse-content >.ant-collapse-content-box {
+  padding-block: 0px;
+}
+.ant-collapse>.ant-collapse-item >.ant-collapse-header {
+  align-items: center;
+  padding: 0;
+}
+
+.ant-collapse {
+  font-family: 'Avenir Light, sans-serif';
+}
+
+.collapse-container {
+  max-height: 500px; /* Set a maximum height for the transition effect */
+  overflow: hidden;
+  transition: max-height 0.3s ease; /* Adjust the duration and easing as needed */
+}
+
+.collapse-container.collapsed {
+  max-height: 0;
+  transition: max-height 0.3s ease; /* Adjust the duration and easing as needed */
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -65,8 +89,8 @@
 }
 
 .hover-card:hover{
-  background: #47d1c3!important;
-  color: white;
+
+  color: #47d1c3!important;
   cursor: pointer;
 
 }
@@ -77,8 +101,7 @@ color:black;
   color: white;
 }
 .active{
-  background: #47d1c3!important;
-  color: white;
+  color: #47d1c3!important;
 
 }
 

@@ -1,9 +1,13 @@
-import { Card } from "antd";
+import { Card, notification, Collapse } from "antd";
 import React, { useState } from "react";
-
+import workBookImg from "../../images/workbook-button.jpg";
+import resourcesImg from "../../images/resource-button.jpg";
+import facebookCommunityImg from "../../images/fb-button.jpg";
+import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import {
-  ArrowRightOutlined,
-  CheckCircleOutlined,
+  ArrowLeftOutlined,
+  CaretRightOutlined,
+
   SearchOutlined,
 } from "@ant-design/icons";
 import { Player, ControlBar } from "video-react";
@@ -16,26 +20,52 @@ import ValuesComponent from "../../components/values-component";
 import SpiritualityComponent from "../../components/spirituality-component";
 import ReviewComponent from "../../components/review-component";
 import ConclusionComponent from "../../components/conclusion-component";
+
+import pdfPathWorkbook from "../../components/download-pdf/awaken-workbook.pdf"; // Update with the correct path
+import pdfPathResources from "../../components/download-pdf/awaken-resources.pdf"; // Update with the correct path
 import { useNavigate } from "react-router-dom";
+
+const { Panel } = Collapse;
 const modulesArray = [
-  "Discovery",
-  "Habits",
-  "Blocks",
-  "Values",
-  "Spirituality",
-  "Review",
-  "Conclusion",
+  {
+    title: "Discovery",
+    videos: ["Video 1", ],
+  },
+  {
+    title: "Habits",
+    videos: ["Video 1", "Video 2", "Video 3"],
+  },
+  {
+    title: "Blocks",
+    videos: ["Video 1", "Video 2", "Video 3","Video 4", "Video 5", "Video 6","Video 7", ],
+  },
+  {
+    title: "Values",
+    videos: ["Video 1", "Video 2", "Video 3","Video 4", "Video 5"],
+  },
+  {
+    title: "Spirituality",
+    videos: ["Video 1", "Video 2", "Video 3","Video 4", "Video 5"],
+  },
+  {
+    title: "Review",
+    videos: ["Video 1", ],
+  },
+  {
+    title: "Conclusion",
+    videos: ["Video 1", ],
+  },
 ];
-
-
-
+interface RightSidebarItem {
+  title: string;
+  url: string;
+  action?: () => void; // Function to execute when clicked
+}
 
 interface VideoPlayerProps {
   src: string;
   poster: string;
 }
-
-
 
 const moduleComponentsArray = [
   WelcomeComponent,
@@ -50,27 +80,66 @@ const moduleComponentsArray = [
 
 const FirstPage: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const navigate = useNavigate();
+  
   //eslint-disable-next-line
   const [forceUpdate, setForceUpdate] = useState(false); // Define the forceUpdate state variable
   const storedUserName = localStorage.getItem("awaken-user-name");
-  const navigate = useNavigate();
-  const handleLogOut = ()=>{
-localStorage.removeItem("awaken-accessToken")
-localStorage.removeItem("awaken-isLoggedIn")
-localStorage.removeItem("awaken-user-name")
-navigate("/")
-  }
+  // const navigate = useNavigate();
+  // const handleLogOut = () => {
+  //   localStorage.removeItem("awaken-accessToken");
+  //   localStorage.removeItem("awaken-isLoggedIn");
+  //   localStorage.removeItem("awaken-user-name");
+  //   navigate("/");
+  // };
 
+  const [api, contextHolder] = notification.useNotification();
 
-  const sideBarTabs = [
-    <a href="/mid-life-journey">Introduction</a>,
-    <a style={{color:"black"}} href="/account">Settings</a>,
-  <p onClick={handleLogOut} style={{color:"black"}} >Logout</p>,
-   
-  
+  const openNotification = (fileName: string) => {
+    let content =
+      fileName === "awaken-workbook.pdf"
+        ? "Awaken Work Book"
+        : "Awaken Resource";
+    api.info({
+      message: `Your ${content} PDF is getting downloaded`,
+    });
+  };
+
+  // Define the downloadPdf function outside the component
+  const downloadPdf = (pdfPath: string, fileName: string) => {
+    openNotification(fileName);
+    const link = document.createElement("a");
+    link.href = pdfPath;
+    link.download = fileName;
+    link.click();
+  };
+  // const sideBarTabs = [
+  //   <a href="/mid-life-journey">Introduction</a>,
+  //   <a style={{ color: "black" }} href="/account">
+  //     Settings
+  //   </a>,
+  //   <p onClick={handleLogOut} style={{ color: "black" }}>
+  //     Logout
+  //   </p>,
+  // ];
+
+  const rightSidebarArray: RightSidebarItem[] = [
+    {
+      title: "work book",
+      url: workBookImg,
+      action: () => downloadPdf(pdfPathWorkbook, "awaken-workbook.pdf"),
+    },
+    {
+      title: "facebook community",
+      url: facebookCommunityImg,
+      action: () => window.open("https://www.facebook.com", "_blank"),
+    },
+    {
+      title: "resources",
+      url: resourcesImg,
+      action: () => downloadPdf(pdfPathResources, "resources.pdf"),
+    },
   ];
-
- 
 
   // Callback function to update completion status in the parent component
   const handleCompletionChange = (moduleName: string, newStatus: boolean) => {
@@ -87,15 +156,16 @@ navigate("/")
     const ComponentToRender = moduleComponentsArray[activeIndex];
     return (
       <ComponentToRender
+      
         onCompletionChange={onCompletionChange}
         onNextClick={handleNextClick}
         onPrevClick={handlePrevClick}
       />
     );
   };
-  const isModuleCompleted = (moduleName: string) => {
+  const isModuleCompleted = (moduleName: string,number:number) => {
     const completedStatus = sessionStorage.getItem(
-      `${moduleName}-completedStatus`
+      `${moduleName}-completedStatus-${number + 1}`
     );
     return completedStatus === "true";
   };
@@ -118,18 +188,22 @@ navigate("/")
 
   return (
     <>
+      {contextHolder}
       <div
         style={{ height: "100vh", background: "#f8f8f8" }}
         className="container-fluid  "
       >
         <div className="row">
           <div
-            style={{ height: "100vh", fontFamily: "'DM Serif Display', serif" }}
-            className="col-md-3 col-lg-2 bg-light sidebar"
+            style={{ height: "100vh", fontFamily: "'DM Serif Display', serif" ,overflowY:"scroll"}}
+            className="col-md-3 col-lg-2 bg-light sidebar scrollable-container"
           >
             {/* Sidebar Content */}
-            <div className="py-3 px-2 text-left">
-              <h2
+            <div className="py-3 px-2 text-left ">
+              <p onClick={()=>navigate("/library")} style={{ cursor: "pointer" }}>
+                <ArrowLeftOutlined className="mr-2" /> Library
+              </p>
+              {/* <h2
                 style={{
                   fontWeight: "500",
                   fontFamily: " 'Dancing Script', cursive",
@@ -138,8 +212,8 @@ navigate("/")
                 className="mb-3 "
               >
                 Awaken
-              </h2>
-              {sideBarTabs.map((tab) => {
+              </h2> */}
+              {/* {sideBarTabs.map((tab) => {
                 return (
                   <p
                     style={{ fontWeight: "500" }}
@@ -151,7 +225,59 @@ navigate("/")
                     </span>
                   </p>
                 );
-              })}
+              })} */}
+              <h4 className={`hover-card ${activeIndex === 0 ? "active" :""}`} onClick={()=>{
+                setActiveIndex(0)
+                navigate("/mid-life-journey")}}>Introduction</h4>
+              <Collapse ghost expandIconPosition="right">
+                {modulesArray.map((module, index) => {
+                  return (
+                    <Panel
+                      key={index}
+                      header={
+                        <div className={`my-2 hover-card text-left ${activeIndex === index + 1 ? "active" :""}`}>
+                          <div className="card-container">
+                            <h4  className="m-0">{module.title}</h4>
+                          </div>
+                        </div>
+                      }
+                    >
+                      {module.videos.map((video, videoIndex) => {
+                        const isCompleted = isModuleCompleted(
+                          module.title,
+                          videoIndex 
+                        );
+                        return (
+                          <div className="d-flex align-items-center " key={videoIndex}>
+                            <a
+                              href={`#${video}`}
+                              style={{ cursor: "pointer",color:"black",fontSize:"18px" }}
+                              className="pl-0 m-1 "
+                              onClick={() => setActiveIndex(index + 1)}
+                            >
+                              <CaretRightOutlined className="mr-1 " />
+                              {video}
+                            </a>
+                            {isCompleted ? (
+                              <p className="m-0">
+                                {" "}
+                                <TaskAltIcon
+                                  className="check-tick text-primary"
+                                  style={{
+                                   fontSize:"18px",
+                                    marginLeft: "8px",
+                                  }}
+                                />
+                              </p>
+                            ) : ""}
+                            <br />
+                          </div>
+                        );
+                      })}
+                    </Panel>
+                  );
+                })}
+              </Collapse>
             </div>
             {/* Add your sidebar content here */}
           </div>
@@ -189,13 +315,13 @@ navigate("/")
                 <h2
                   style={{
                     fontWeight: "500",
-                    fontFamily: " 'Dancing Script', cursive",
+                    fontFamily: "'Marmelad', sans-serif",
                     fontSize: "80px",
                     zIndex: "1",
                   }}
                   className="mb-3 "
                 >
-                  Mid Life Evolution
+                  Awaken
                 </h2>
               </div>
               <div className="p-2 text-left">
@@ -240,46 +366,25 @@ navigate("/")
                     style={{ height: "60vh", overflowY: "scroll" }}
                     className="scrollable-container"
                   >
-                    {modulesArray.map((module, index) => {
-                      const isCompleted = isModuleCompleted(module);
+                    {rightSidebarArray.map((module, index) => {
                       return (
                         <Card
+                          onClick={module.action}
+                          style={{
+                            background: `url(${module.url})`,
+                            height: "300px",
+                            backgroundPosition: "center",
+                            cursor: "pointer",
+                            backgroundSize:"contain",
+                            
+                          }}
                           key={index}
-                          onClick={() => setActiveIndex(index + 1)}
-                          className={`m-2 hover-card ${
-                            activeIndex === index + 1 ? "active" : ""
-                          }`}
+                          className={`m-2   `}
                         >
-                          <div className="card-container">
-                            {isCompleted ? (
-                              <h3>
-                                <strong>
-                                  {" "}
-                                  <CheckCircleOutlined
-                                    className="check-tick"
-                                    style={{
-                                      fontWeight: "bold",
-                                      marginRight: "10px",
-                                    }}
-                                  />
-                                </strong>
-                              </h3>
-                            ) : (
-                              <h3>
-                                <strong>
-                                  {" "}
-                                  <CheckCircleOutlined
-                                    className="check-tick invisible"
-                                    style={{
-                                      fontWeight: "bold",
-                                      marginRight: "10px",
-                                    }}
-                                  />
-                                </strong>
-                              </h3>
-                            )}
-                            <h3>{module}</h3>
-                          </div>
+                          {/* <div className="card-container">
+                            
+                            <img style={{width:"100%"}} src ={module.url} alt=""/>
+                          </div> */}
                         </Card>
                       );
                     })}

@@ -26,7 +26,7 @@ const LoginPage: React.FC = () => {
             <h2
               style={{
                 fontWeight: "500",
-                fontFamily: " 'Dancing Script', cursive",
+                fontFamily: "'Marmelad', sans-serif",
                 fontSize: "80px",
               }}
               className="mb-5 mt-5 "

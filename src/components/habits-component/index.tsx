@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { VideoPlayer } from "../../pages/first-page";
 import welcomeVideo from "../../videos/welcome-video.mp4";
 import { CheckOutlined, LeftOutlined, RightOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
 interface HabitsComponentProps {
   onCompletionChange: (moduleName: string, newStatus: boolean) => void;
@@ -14,24 +15,31 @@ const HabitsComponent: React.FC<HabitsComponentProps> = ({
   onPrevClick,
 }) => {
   const moduleName = "Habits"; // The name of the module
+const navigate = useNavigate();
+  const [completed, setCompleted] = React.useState<boolean>(false);
 
-  const [completed, setCompleted] = React.useState(false);
+  const videoNumberMatch = window.location.hash.match(/Video%20(\d+)/);
+
+  const numericVideoNumber = videoNumberMatch ? videoNumberMatch[1] : null;
 
   // Load completion status from sessionStorage on component mount
   useEffect(() => {
     const storedCompletedStatus = sessionStorage.getItem(
-      `${moduleName}-completedStatus`
+      `${moduleName}-completedStatus-${numericVideoNumber}`
     );
+      
     if (storedCompletedStatus) {
       setCompleted(storedCompletedStatus === "true");
+    }else{
+      setCompleted(false)
     }
-  }, []);
+  }, [numericVideoNumber,navigate]);
   /// Update completion status and sessionStorage when the button is clicked
   const handleButtonClick = () => {
     const newCompletedStatus = !completed;
     setCompleted(newCompletedStatus);
     sessionStorage.setItem(
-      `${moduleName}-completedStatus`,
+      `${moduleName}-completedStatus-${numericVideoNumber}`,
       String(newCompletedStatus)
     );
 
@@ -50,13 +58,14 @@ const HabitsComponent: React.FC<HabitsComponentProps> = ({
     onPrevClick();
   };
   return (
-    <div className=" p-3 text-left ">
+    <div className=" p-3 text-left " data-aos="fade-left">
       <div>
         <div className="d-flex justify-content-between flex-wrap align-content-center">
           <h1 className="  mb-3">
             {" "}
-            <strong>Module 2 - Habits</strong>
+            <strong>Habits - Video {numericVideoNumber}</strong>
           </h1>
+
           <div
             className={`btn ${
               completed ? " btn-completed" : " btn-not-completed "
@@ -82,7 +91,7 @@ const HabitsComponent: React.FC<HabitsComponentProps> = ({
         descriptive paragraph which gives details about a person, place thing or
         idea
       </p>
-      <div className="d-flex w-100 justify-content-between">
+      <div className="d-flex w-100 justify-content-between ">
         <div
           className="mb-3 mt-3"
           style={{ cursor: "pointer" }}
@@ -103,26 +112,8 @@ const HabitsComponent: React.FC<HabitsComponentProps> = ({
           </p>
         </div>
       </div>
-      <div className="mb-3" style={{ height: "70%", width: "70%" }}>
-        <h5 className="text-primary font-weight-bold pl-2 mb-3">Video 1</h5>
-        <VideoPlayer
-          src={welcomeVideo}
-          poster={
-            "https://res.cloudinary.com/dsw1ubwyh/image/upload/v1702563224/cymfgrw5mkkavedstduo.png"
-          }
-        />
-      </div>
-      <div  className="mb-3" style={{ height: "70%", width: "70%" }}>
-      <h5 className="text-primary font-weight-bold pl-2 mb-3">Video 2</h5>
-        <VideoPlayer
-          src={welcomeVideo}
-          poster={
-            "https://res.cloudinary.com/dsw1ubwyh/image/upload/v1702563224/cymfgrw5mkkavedstduo.png"
-          }
-        />
-      </div>
-      <div  className="mb-3" style={{ height: "70%", width: "70%" }}>
-      <h5 className="text-primary font-weight-bold pl-2 mb-3">Video 3</h5>
+
+      <div style={{ height: "70%", width: "70%" }}>
         <VideoPlayer
           src={welcomeVideo}
           poster={
