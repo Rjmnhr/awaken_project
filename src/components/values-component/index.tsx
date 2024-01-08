@@ -2,21 +2,22 @@ import React, { useEffect } from "react";
 import { VideoPlayer } from "../../pages/first-page";
 
 import { CheckOutlined, LeftOutlined, RightOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
 import { videos } from "../video-info";
+import AxiosInstance from "../axios";
 
 interface ValuesComponentProps {
   onCompletionChange: (moduleName: string, newStatus: boolean) => void;
   onNextClick: () => void;
   onPrevClick: () => void;
+  userEmail: string
 }
 const ValuesComponent: React.FC<ValuesComponentProps> = ({
   onCompletionChange,
   onNextClick,
   onPrevClick,
+  userEmail
 }) => {
   const moduleName = "Values"; // The name of the module
-  const navigate = useNavigate();
   const [completed, setCompleted] = React.useState<boolean>(false);
 
   const videoNumberMatch = window.location.hash.match(/Video%20(\d+)/);
@@ -25,30 +26,51 @@ const ValuesComponent: React.FC<ValuesComponentProps> = ({
     ? parseInt(videoNumberMatch[1])
     : 0;
 
-  // Load completion status from sessionStorage on component mount
-  useEffect(() => {
-    const storedCompletedStatus = sessionStorage.getItem(
-      `${moduleName}-completedStatus-${numericVideoNumber}`
-    );
-
-    if (storedCompletedStatus) {
-      setCompleted(storedCompletedStatus === "true");
-    } else {
-      setCompleted(false);
-    }
-  }, [numericVideoNumber, navigate]);
-  /// Update completion status and sessionStorage when the button is clicked
-  const handleButtonClick = () => {
-    const newCompletedStatus = !completed;
-    setCompleted(newCompletedStatus);
-    sessionStorage.setItem(
-      `${moduleName}-completedStatus-${numericVideoNumber}`,
-      String(newCompletedStatus)
-    );
-
-    // Call the callback function to update the completion status in the parent component
-    onCompletionChange(moduleName, newCompletedStatus);
-  };
+    useEffect(() => {
+      const fetchCompletionStatus = async () => {
+        try {
+          // Make the POST request with formData including moduleName, numericVideoNumber, and email
+  
+          const response = await AxiosInstance.post(
+            "/api/completion/video-completion-status",
+            {
+              email: userEmail,
+              module: moduleName,
+              videoNo: numericVideoNumber,
+            }
+          );
+  
+          setCompleted(response.data.completed || false);
+          // Call the callback function to update the completion status in the parent component
+          onCompletionChange(moduleName, response.data.completed || false);
+        } catch (error) {
+          console.error("Error fetching completion status:", error);
+        }
+      };
+  
+      fetchCompletionStatus();
+      //eslint-disable-next-line
+    }, [numericVideoNumber, moduleName, userEmail]);
+    const handleButtonClick = async () => {
+      const newCompletedStatus = !completed;
+      setCompleted(newCompletedStatus);
+  
+      try {
+        await AxiosInstance.post(`/api/completion/update-video-completion`, {
+          email: userEmail,
+          module: moduleName,
+          videoNo: numericVideoNumber,
+          status: newCompletedStatus,
+        });
+        sessionStorage.setItem(
+          `${moduleName}-completedStatus-${numericVideoNumber}`,
+          String(newCompletedStatus)
+        );
+        onCompletionChange(moduleName, newCompletedStatus);
+      } catch (error) {
+        console.error("Error updating completion status:", error);
+      }
+    };
 
   // Handle "Next" button click
   const handleNextClick = () => {
@@ -113,7 +135,7 @@ const ValuesComponent: React.FC<ValuesComponentProps> = ({
 
       <div style={{ height: "70%", width: "70%" }}>
         <VideoPlayer
-          src={videos[3].Values[numericVideoNumber - 1].url}
+          src={videos[3]?.Values[numericVideoNumber - 1]?.url}
           poster={
             "https://res.cloudinary.com/dsw1ubwyh/image/upload/v1702563224/cymfgrw5mkkavedstduo.png"
           }

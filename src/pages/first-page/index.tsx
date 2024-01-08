@@ -3,10 +3,13 @@ import React, { useEffect, useState } from "react";
 import workBookImg from "../../images/workbook-button.jpg";
 import resourcesImg from "../../images/resource-button.jpg";
 import facebookCommunityImg from "../../images/fb-button.jpg";
+import workBookIcon from "../../images/notebook.png";
+import resourcesIcon from "../../images/hiring.png";
+import facebookCommunityIcon from "../../images/facebook-2.png";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import { ArrowLeftOutlined, CaretRightOutlined } from "@ant-design/icons";
 import "video-react/dist/video-react.css";
-import WelcomeComponent from "../../components/welcome";
+import headerImg from "../../images/top-header-photo.jpg";
 import DiscoveryComponent from "../../components/discovery-component";
 import HabitsComponent from "../../components/habits-component";
 import BlocksComponent from "../../components/blocks-component";
@@ -19,11 +22,12 @@ import pdfPathWorkbook from "../../components/download-pdf/awaken-workbook.pdf";
 import pdfPathResources from "../../components/download-pdf/awaken-resources.pdf"; // Update with the correct path
 import { useNavigate } from "react-router-dom";
 import ReactPlayer from "react-player";
+import AxiosInstance from "../../components/axios";
 
 const { Panel } = Collapse;
 const modulesArray = [
   {
-    title: "Discovery",
+    title: "Discovery / Introduction",
     videos: ["Video 1"],
   },
   {
@@ -63,6 +67,7 @@ interface RightSidebarItem {
   title: string;
   url: string;
   action?: () => void; // Function to execute when clicked
+  icon: string;
 }
 
 interface VideoPlayerProps {
@@ -71,7 +76,6 @@ interface VideoPlayerProps {
 }
 
 const moduleComponentsArray = [
-  WelcomeComponent,
   DiscoveryComponent,
   HabitsComponent,
   BlocksComponent,
@@ -84,20 +88,12 @@ const moduleComponentsArray = [
 const FirstPage: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const navigate = useNavigate();
-
+  const userEmail = localStorage.getItem("awaken-user-email") || "";
   //eslint-disable-next-line
   const [forceUpdate, setForceUpdate] = useState(false); // Define the forceUpdate state variable
   const storedUserName = localStorage.getItem("awaken-user-name");
-  // const navigate = useNavigate();
-  // const handleLogOut = () => {
-  //   localStorage.removeItem("awaken-accessToken");
-  //   localStorage.removeItem("awaken-isLoggedIn");
-  //   localStorage.removeItem("awaken-user-name");
-  //   navigate("/");
-  // };
-
+  const [completionStatuses, setCompletionStatuses] = useState<any[]>([]);
   const [api, contextHolder] = notification.useNotification();
-
   const [isMobile, setIsMobile] = React.useState<boolean>(false);
 
   useEffect(() => {
@@ -140,31 +136,29 @@ const FirstPage: React.FC = () => {
     link.download = fileName;
     link.click();
   };
-  // const sideBarTabs = [
-  //   <a href="/mid-life-journey">Introduction</a>,
-  //   <a style={{ color: "black" }} href="/account">
-  //     Settings
-  //   </a>,
-  //   <p onClick={handleLogOut} style={{ color: "black" }}>
-  //     Logout
-  //   </p>,
-  // ];
 
   const rightSidebarArray: RightSidebarItem[] = [
     {
-      title: "work book",
+      title: "Work book",
       url: workBookImg,
       action: () => downloadPdf(pdfPathWorkbook, "awaken-workbook.pdf"),
+      icon: workBookIcon,
     },
     {
-      title: "facebook community",
+      title: "Facebook community",
       url: facebookCommunityImg,
-      action: () => window.open("https://www.facebook.com", "_blank"),
+      action: () =>
+        window.open(
+          "https://www.facebook.com/groups/733711701964744/",
+          "_blank"
+        ),
+      icon: facebookCommunityIcon,
     },
     {
-      title: "resources",
+      title: "Resources",
       url: resourcesImg,
       action: () => downloadPdf(pdfPathResources, "resources.pdf"),
+      icon: resourcesIcon,
     },
   ];
 
@@ -186,29 +180,105 @@ const FirstPage: React.FC = () => {
         onCompletionChange={onCompletionChange}
         onNextClick={handleNextClick}
         onPrevClick={handlePrevClick}
+        userEmail={userEmail}
       />
     );
   };
-  const isModuleCompleted = (moduleName: string, number: number) => {
-    const completedStatus = sessionStorage.getItem(
-      `${moduleName}-completedStatus-${number + 1}`
-    );
-    return completedStatus === "true";
+  const loadCompletionStatuses = async () => {
+    try {
+      const completionStatuses = await Promise.all(
+        modulesArray.map(async (module, index) => {
+          const videoCompletionStatuses = await Promise.all(
+            module.videos.map(async (video, videoIndex) => {
+              const response = await AxiosInstance.post(
+                "/api/completion/video-completion-status",
+                {
+                  email: userEmail,
+                  module: module.title,
+                  videoNo: videoIndex + 1,
+                }
+              );
+              return response.data.completed || false;
+            })
+          );
+
+          return {
+            moduleTitle: module.title,
+            videoStatuses: videoCompletionStatuses,
+          };
+        })
+      );
+
+      setCompletionStatuses(completionStatuses);
+    } catch (error) {
+      console.error("Error fetching completion statuses:", error);
+    }
   };
 
+  const isModuleCompleted = (moduleName: string, videoIndex: number) => {
+    const completedStatus = sessionStorage.getItem(
+      `${moduleName}-completedStatus-${videoIndex + 1}`
+    );
+
+    if (completedStatus) {
+      return completedStatus === "true";
+    } else {
+      const moduleIndex = modulesArray.findIndex(
+        (module) => module.title === moduleName
+      );
+      return (
+        completionStatuses[moduleIndex]?.videoStatuses[videoIndex] || false
+      );
+    }
+  };
+
+  useEffect(() => {
+    loadCompletionStatuses();
+    // eslint-disable-next-line
+  }, [userEmail]);
+
   const handleNextClick = () => {
-    // Implement the logic to update the activeIndex in the parent component
-    // For now, I'll just increment the activeIndex as an example
-    if (activeIndex < 7) {
-      setActiveIndex((prevIndex) => prevIndex + 1);
+    const currentModule = modulesArray[activeIndex];
+    const totalVideos = currentModule.videos.length;
+
+    const currentVideoIndex =
+      parseInt(window.location.hash.replace("#Video%20", ""), 10) || 1;
+    const nextVideoIndex = (currentVideoIndex % totalVideos) + 1;
+
+    if (nextVideoIndex === 1) {
+      // Move to the next module when reaching the last video in the current module
+      if (activeIndex < modulesArray.length - 1) {
+        setActiveIndex((prevIndex) => prevIndex + 1);
+        navigate(`#Video%201`);
+      }
+    } else {
+      // Move to the next video within the current module
+      navigate(`#Video%20${nextVideoIndex}`);
     }
   };
 
   const handlePrevClick = () => {
-    // Implement the logic to update the activeIndex in the parent component
-    // For now, I'll just increment the activeIndex as an example
-    if (activeIndex > 1) {
-      setActiveIndex((prevIndex) => prevIndex - 1);
+    const currentModule = modulesArray[activeIndex];
+
+    const totalVideos = currentModule.videos.length;
+
+    const currentVideoIndex =
+      parseInt(window.location.hash.replace("#Video%20", ""), 10) || 1;
+    const prevVideoIndex =
+      ((currentVideoIndex - 2 + totalVideos) % totalVideos) + 1;
+
+    if (prevVideoIndex === totalVideos) {
+      // Move to the previous module when reaching the first video in the current module
+      if (activeIndex > 0) {
+        setActiveIndex((prevIndex) => prevIndex - 1);
+        const currentModule = modulesArray[activeIndex - 1];
+        const totalVideos = currentModule.videos.length;
+        navigate(`#Video%20${totalVideos}`);
+      }
+    } else {
+      navigate(`#Video%20${prevVideoIndex}`);
+
+      // Move to the previous video within the current module
     }
   };
 
@@ -239,15 +309,6 @@ const FirstPage: React.FC = () => {
                 <ArrowLeftOutlined className="mr-2" /> Library
               </p>
 
-              <h4
-                className={`hover-card ${activeIndex === 0 ? "active" : ""}`}
-                onClick={() => {
-                  setActiveIndex(0);
-                  navigate("/mid-life-journey");
-                }}
-              >
-                Introduction
-              </h4>
               <Collapse ghost expandIconPosition="right">
                 {modulesArray.map((module, index) => {
                   return (
@@ -256,11 +317,11 @@ const FirstPage: React.FC = () => {
                       header={
                         <div
                           className={`my-2 hover-card text-left ${
-                            activeIndex === index + 1 ? "active" : ""
+                            activeIndex === index ? "active" : ""
                           }`}
                         >
-                          <div className="card-container">
-                            <h4 className="m-0">{module.title}</h4>
+                          <div className="card-container tex-left">
+                            <h4 className="m-0 text-left">{module.title}</h4>
                           </div>
                         </div>
                       }
@@ -283,7 +344,7 @@ const FirstPage: React.FC = () => {
                                 fontSize: "18px",
                               }}
                               className="pl-0 m-1 "
-                              onClick={() => setActiveIndex(index + 1)}
+                              onClick={() => setActiveIndex(index)}
                             >
                               <CaretRightOutlined className="mr-1 " />
                               {video}
@@ -311,39 +372,43 @@ const FirstPage: React.FC = () => {
                 })}
               </Collapse>
             </div>
-            <div style={{ fontSize: "11px" }} className="text-left">
-              <p>Video courtesy:</p>
+            {isMobile ? (
+              <div style={{ fontSize: "8px" }} className="text-left mb-3">
+                <p className="mb-1">Video courtesy:</p>
 
-              <p>
-                {" "}
-                Video by Ruvim Miksanskiy: {""}
-                <a href="https://www.pexels.com/video/video-of-forest-1448735/">
-                  https://www.pexels.com/video/video-of-forest-1448735/
-                </a>
-              </p>
-              <p>
-                Video by Kelly :
-                <a href=" https://www.pexels.com/video/a-big-cascading-waterfall-2253462/">
+                <p className="m-0">
                   {" "}
-                  https://www.pexels.com/video/a-big-cascading-waterfall-2253462/
-                </a>
-              </p>
-              <p>
-                {" "}
-                Video by Peter Fowler:
-                <a href=" https://www.pexels.com/video/ocean-waves-video-1093652/">
+                  Video by Ruvim Miksanskiy: {""}
+                  <a href="https://www.pexels.com/video/video-of-forest-1448735/">
+                    https://www.pexels.com/video/video-of-forest-1448735/
+                  </a>
+                </p>
+                <p className="m-0">
+                  Video by Kelly :
+                  <a href=" https://www.pexels.com/video/a-big-cascading-waterfall-2253462/">
+                    {" "}
+                    https://www.pexels.com/video/a-big-cascading-waterfall-2253462/
+                  </a>
+                </p>
+                <p className="m-0">
                   {" "}
-                  https://www.pexels.com/video/ocean-waves-video-1093652/
-                </a>
-              </p>
-              <p>
-                Video by Alex Fu:
-                <a href=" https://www.pexels.com/video/timelapse-of-night-sky-over-lake-3493603/">
-                  {" "}
-                  https://www.pexels.com/video/timelapse-of-night-sky-over-lake-3493603/
-                </a>
-              </p>
-            </div>
+                  Video by Peter Fowler:
+                  <a href=" https://www.pexels.com/video/ocean-waves-video-1093652/">
+                    {" "}
+                    https://www.pexels.com/video/ocean-waves-video-1093652/
+                  </a>
+                </p>
+                <p className="m-0">
+                  Video by Alex Fu:
+                  <a href=" https://www.pexels.com/video/timelapse-of-night-sky-over-lake-3493603/">
+                    {" "}
+                    https://www.pexels.com/video/timelapse-of-night-sky-over-lake-3493603/
+                  </a>
+                </p>
+              </div>
+            ) : (
+              ""
+            )}
             {/* Add your sidebar content here */}
           </div>
 
@@ -355,8 +420,7 @@ const FirstPage: React.FC = () => {
               <div
                 style={{
                   height: "70%",
-                  background:
-                    "url(https://res.cloudinary.com/dsw1ubwyh/image/upload/v1702562135/nnau7bfmuktzsxteycpa.jpg)",
+                  background: `url(${headerImg})`,
                   backgroundRepeat: "no-repeat",
                   backgroundSize: "cover",
                   backgroundPosition: "center",
@@ -374,7 +438,7 @@ const FirstPage: React.FC = () => {
                     width: "100%",
                     height: "100%",
                     background:
-                      "rgba(0, 0, 0, 0.3)" /* Adjust the opacity as needed */,
+                      "rgba(250, 250, 250, 0.5)" /* Adjust the opacity as needed */,
                   }}
                 ></div>
                 <h2
@@ -405,16 +469,88 @@ const FirstPage: React.FC = () => {
             <div className="d-md-flex">
               <div
                 className="col-lg-8 col-12 pt-1 pr-0  mt-2 scrollable-container"
-                style={{ maxHeight: "70vh", overflowY: "scroll" }}
+                style={{ maxHeight: "69vh", overflowY: "scroll" }}
               >
                 {renderComponent(
                   handleCompletionChange,
                   handleNextClick,
                   handlePrevClick
                 )}
+                {isMobile ? (
+                  ""
+                ) : (
+                  <div style={{ fontSize: "8px" }} className="text-left mb-3">
+                    <p className="mb-1">Video courtesy:</p>
+
+                    <p className="m-0">
+                      {" "}
+                      Video by Ruvim Miksanskiy: {""}
+                      <a href="https://www.pexels.com/video/video-of-forest-1448735/">
+                        https://www.pexels.com/video/video-of-forest-1448735/
+                      </a>
+                    </p>
+                    <p className="m-0">
+                      Video by Kelly :
+                      <a href=" https://www.pexels.com/video/a-big-cascading-waterfall-2253462/">
+                        {" "}
+                        https://www.pexels.com/video/a-big-cascading-waterfall-2253462/
+                      </a>
+                    </p>
+                    <p className="m-0">
+                      {" "}
+                      Video by Peter Fowler:
+                      <a href=" https://www.pexels.com/video/ocean-waves-video-1093652/">
+                        {" "}
+                        https://www.pexels.com/video/ocean-waves-video-1093652/
+                      </a>
+                    </p>
+                    <p className="m-0">
+                      Video by Alex Fu:
+                      <a href=" https://www.pexels.com/video/timelapse-of-night-sky-over-lake-3493603/">
+                        {" "}
+                        https://www.pexels.com/video/timelapse-of-night-sky-over-lake-3493603/
+                      </a>
+                    </p>
+                  </div>
+                )}
               </div>
               {isMobile ? (
-                ""
+                <div>
+                  <div className="p-2 d-flex justify-content-around text-center container-fluid">
+                    {/* <div className="row m-2 p-1 ">
+                    <SearchOutlined className="pr-2" />
+                    <input
+                      style={{
+                        outline: "none",
+                        border: "none",
+                        background: "transparent",
+                      }}
+                      type="text"
+                      placeholder="Search for something.."
+                    />
+                  </div> */}
+
+                    {rightSidebarArray.map((module, index) => {
+                      return (
+                        <div
+                          onClick={module.action}
+                          key={index}
+                          className={`m-2   `}
+                        >
+                          <img
+                            style={{ width: "30px" }}
+                            src={module.icon}
+                            alt=""
+                            className="mb-2"
+                          />
+                          <label style={{ fontSize: "14px" }}>
+                            {module.title}
+                          </label>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               ) : (
                 <div className="col-md-3 col-lg-4  mt-2 d-lg-block   ">
                   <div className="p-2">
@@ -431,7 +567,7 @@ const FirstPage: React.FC = () => {
                     />
                   </div> */}
                     <div
-                      style={{ height: "60vh", overflowY: "scroll" }}
+                      style={{ height: "67vh", overflowY: "scroll" }}
                       className="scrollable-container "
                     >
                       {rightSidebarArray.map((module, index) => {

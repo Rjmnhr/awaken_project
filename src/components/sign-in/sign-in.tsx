@@ -63,9 +63,10 @@ const SignIn: React.FC = () => {
       const accessToken = data.accessToken;
 
       const userName = data.first_name;
-
+const userEmail = data.email
       localStorage.setItem("awaken-isLoggedIn", "true");
       localStorage.setItem("awaken-user-name", userName);
+      localStorage.setItem("awaken-user-email", userEmail);
 
       localStorage.setItem("awaken-accessToken", accessToken);
 

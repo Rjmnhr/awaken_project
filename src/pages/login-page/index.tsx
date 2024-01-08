@@ -2,7 +2,7 @@ import React from "react";
 import SignIn from "../../components/sign-in/sign-in";
 import SignUp from "../../components/sign-up/sign-up";
 import { useApplicationContext } from "../../context/app-context";
-
+import bgImg from "../../images/pexels-irina-iriser-1405691.jpg";
 import { LoginPageStyled } from "./style";
 
 const LoginPage: React.FC = () => {
@@ -15,7 +15,7 @@ const LoginPage: React.FC = () => {
           <div
             className="left-container img_container"
             style={{
-              backgroundImage: `url(https://res.cloudinary.com/dsw1ubwyh/image/upload/v1702562135/nnau7bfmuktzsxteycpa.jpg)`,
+              backgroundImage: `url(${bgImg})`,
               backgroundPosition: "center",
               backgroundSize: "cover",
               height: "100vh",

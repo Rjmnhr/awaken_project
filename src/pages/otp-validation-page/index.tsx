@@ -2,6 +2,7 @@ import React from "react";
 
 import { LoginPageStyled } from "../login-page/style";
 import OtpVerification from "../../components/otp-verification";
+import bgImg from "../../images/pexels-irina-iriser-1405691.jpg";
 import { Steps } from "antd";
 const items = [
   {
@@ -22,7 +23,7 @@ const OtpValidationPage: React.FC = () => {
           <div
             className="left-container img_container"
             style={{
-              backgroundImage: `url(https://res.cloudinary.com/dsw1ubwyh/image/upload/v1702562135/nnau7bfmuktzsxteycpa.jpg)`,
+              backgroundImage: `url(${bgImg})`,
               backgroundPosition: "center",
               backgroundSize: "cover",
               height: "100vh",
@@ -30,15 +31,13 @@ const OtpValidationPage: React.FC = () => {
             }}
           ></div>
           <div className="right-container">
-         
-          <Steps
+            <Steps
               className="col-lg-12 col-12  mb-5 "
               current={1}
               size="small"
               items={items}
             />
             <div className="right-sub-container mt-5 ">
-           
               <div>
                 <OtpVerification />
               </div>

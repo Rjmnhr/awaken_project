@@ -2,6 +2,7 @@ import React from "react";
 import SignUp from "../../components/sign-up/sign-up";
 import { Steps } from "antd";
 import { LoginPageStyled } from "../login-page/style";
+import bgImg from "../../images/pexels-irina-iriser-1405691.jpg";
 const items = [
   {
     title: "Details",
@@ -21,7 +22,7 @@ const ProductPurchasePage = () => {
           <div
             className="left-container img_container"
             style={{
-              backgroundImage: `url(https://res.cloudinary.com/dsw1ubwyh/image/upload/v1702562135/nnau7bfmuktzsxteycpa.jpg)`,
+              backgroundImage: `url(${bgImg})`,
               backgroundPosition: "center",
               backgroundSize: "cover",
               height: "100vh",
