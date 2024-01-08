@@ -1,8 +1,9 @@
 import React, { useEffect } from "react";
 import { VideoPlayer } from "../../pages/first-page";
-import welcomeVideo from "../../videos/welcome-video.mp4";
+
 import { CheckOutlined, LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import { videos } from "../video-info";
 
 interface DiscoveryComponentProps {
   onCompletionChange: (moduleName: string, newStatus: boolean) => void;
@@ -15,7 +16,7 @@ const DiscoveryComponent: React.FC<DiscoveryComponentProps> = ({
   onPrevClick,
 }) => {
   const moduleName = "Discovery"; // The name of the module
-const navigate = useNavigate();
+  const navigate = useNavigate();
   const [completed, setCompleted] = React.useState<boolean>(false);
 
   const videoNumberMatch = window.location.hash.match(/Video%20(\d+)/);
@@ -27,13 +28,13 @@ const navigate = useNavigate();
     const storedCompletedStatus = sessionStorage.getItem(
       `${moduleName}-completedStatus-${numericVideoNumber}`
     );
-      
+
     if (storedCompletedStatus) {
       setCompleted(storedCompletedStatus === "true");
-    }else{
-      setCompleted(false)
+    } else {
+      setCompleted(false);
     }
-  }, [numericVideoNumber,navigate]);
+  }, [numericVideoNumber, navigate]);
   /// Update completion status and sessionStorage when the button is clicked
   const handleButtonClick = () => {
     const newCompletedStatus = !completed;
@@ -58,7 +59,7 @@ const navigate = useNavigate();
     onPrevClick();
   };
   return (
-    <div className=" p-3 text-left  "data-aos="fade-left">
+    <div className=" p-3 text-left  " data-aos="fade-left">
       <div>
         <div className="d-flex justify-content-between flex-wrap align-content-center">
           <h1 className="  mb-3">
@@ -69,9 +70,9 @@ const navigate = useNavigate();
           <div
             className={`btn ${
               completed ? " btn-completed" : " btn-not-completed "
-            }  mt-3 mt-lg-1 p-2 `}
+            }  mt-3 mt-lg-1 p-2  `}
             onClick={handleButtonClick}
-            style={{ transition: "all 0.3s ease", height: "50px" }}
+            style={{ transition: "all 0.3s ease", height: "50px", }}
           >
             <span className="p-0" style={{ transition: "all 0.3s ease" }}>
               {completed ? (
@@ -86,11 +87,6 @@ const navigate = useNavigate();
         </div>
       </div>
 
-      <p className="mb-3">
-        A narrative paragraph which tells a story of a certain event. A
-        descriptive paragraph which gives details about a person, place thing or
-        idea
-      </p>
       <div className="d-flex w-100 justify-content-between ">
         <div
           className="mb-3 mt-3"
@@ -113,9 +109,9 @@ const navigate = useNavigate();
         </div>
       </div>
 
-      <div style={{ height: "70%", width: "70%" }}>
+      <div style={{ height: "90%", width: "90%" }}>
         <VideoPlayer
-          src={welcomeVideo}
+          src={videos[0]?.Discovery[0]?.url}
           poster={
             "https://res.cloudinary.com/dsw1ubwyh/image/upload/v1702563224/cymfgrw5mkkavedstduo.png"
           }

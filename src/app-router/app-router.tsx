@@ -6,6 +6,9 @@ import OtpValidationPage from "../pages/otp-validation-page";
 import SuccessfulRegistration from "../pages/success-registration";
 import LibraryPage from "../pages/library-page";
 import AccountPage from "../pages/account-page";
+import CheckoutComponent from "../components/payment-checkout/Checkout";
+import ProductPurchasePage from "../pages/product-purchase";
+import Success from "../components/payment-checkout/Success";
 
 const AppRoute: React.FC = () => {
   return (
@@ -43,7 +46,7 @@ const AppRoute: React.FC = () => {
             </>
           }
         />
-         <Route
+        <Route
           path="/library"
           element={
             <>
@@ -56,6 +59,30 @@ const AppRoute: React.FC = () => {
           element={
             <>
               <AccountPage />
+            </>
+          }
+        />
+        <Route
+          path="/create-account"
+          element={
+            <>
+              <ProductPurchasePage />
+            </>
+          }
+        />
+        <Route
+          path="/payment-checkout"
+          element={
+            <>
+              <CheckoutComponent price="price_1OV8x5DNZni9rE7FGqYpc9lW" />
+            </>
+          }
+        />
+        <Route
+          path="/success.html"
+          element={
+            <>
+              <Success />
             </>
           }
         />

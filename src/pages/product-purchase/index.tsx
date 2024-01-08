@@ -1,8 +1,7 @@
 import React from "react";
-
-import { LoginPageStyled } from "../login-page/style";
-import OtpVerification from "../../components/otp-verification";
+import SignUp from "../../components/sign-up/sign-up";
 import { Steps } from "antd";
+import { LoginPageStyled } from "../login-page/style";
 const items = [
   {
     title: "Details",
@@ -14,9 +13,9 @@ const items = [
     title: "Payment",
   },
 ];
-const OtpValidationPage: React.FC = () => {
+const ProductPurchasePage = () => {
   return (
-    <>
+    <div className="">
       <LoginPageStyled>
         <div className="main-container" style={{ height: "100vh" }}>
           <div
@@ -30,24 +29,32 @@ const OtpValidationPage: React.FC = () => {
             }}
           ></div>
           <div className="right-container">
-         
-          <Steps
-              className="col-lg-12 col-12  mb-5 "
-              current={1}
+            <h2
+              style={{
+                fontWeight: "500",
+                fontFamily: "'Marmelad', sans-serif",
+                fontSize: "80px",
+              }}
+              className="mb-5 mt-5 "
+            >
+              Awaken <br />
+            </h2>
+            <Steps
+              className="col-lg-8 col-12"
+              current={0}
               size="small"
               items={items}
             />
-            <div className="right-sub-container mt-5 ">
-           
+            <div className="right-sub-container ">
               <div>
-                <OtpVerification />
+                <SignUp />
               </div>
             </div>
           </div>
         </div>
       </LoginPageStyled>
-    </>
+    </div>
   );
 };
 
-export default OtpValidationPage;
+export default ProductPurchasePage;

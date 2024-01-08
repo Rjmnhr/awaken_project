@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useApplicationContext } from "../../context/app-context";
+
 import { Input, message } from "antd";
 import {
   EyeInvisibleOutlined,
@@ -17,11 +17,10 @@ const SignIn: React.FC = () => {
 
   const navigate = useNavigate();
 
-  const { setIsSignIn, setIsLoggedIn } = useApplicationContext();
   const [messageApi, contextHolder] = message.useMessage();
 
   const handleSwitch = () => {
-    setIsSignIn(false);
+    navigate("/create-account");
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -38,41 +37,43 @@ const SignIn: React.FC = () => {
       });
 
       const data = await response.data;
+      console.log("🚀 ~ file: sign-in.tsx:40 ~ handleSubmit ~ data:", data)
 
       setIsLoading(false);
 
       if (data === 404) {
         error("Wrong password or username");
-      
-        const inputWrapper = document.querySelector(".ant-input-affix-wrapper") as HTMLElement | null;
-        const emailInput = document.querySelector("#email-login") as HTMLElement | null;
-      
+
+        const inputWrapper = document.querySelector(
+          ".ant-input-affix-wrapper"
+        ) as HTMLElement | null;
+        const emailInput = document.querySelector(
+          "#email-login"
+        ) as HTMLElement | null;
+
         if (inputWrapper && emailInput) {
           inputWrapper.style.border = "1px solid red";
           emailInput.style.border = "1px solid red";
         }
-      
+
         return;
       }
       success();
 
       const accessToken = data.accessToken;
-     
-      const userName = data.first_name;
 
+      const userName = data.first_name;
 
       localStorage.setItem("awaken-isLoggedIn", "true");
       localStorage.setItem("awaken-user-name", userName);
 
       localStorage.setItem("awaken-accessToken", accessToken);
 
-      setIsLoggedIn(true);
-
       setEmail("");
       setPassword("");
       navigate("/library");
     } catch (err) {
-alert("error")
+      alert("error");
       console.log(err);
     }
   };
@@ -104,7 +105,7 @@ alert("error")
   }, [isLoading]);
 
   return (
-    <div className="container " >
+    <div className="container ">
       {contextHolder}
       <div className="container card col-12  p-3" data-aos="fade-left">
         <div className="section-title">
@@ -116,7 +117,7 @@ alert("error")
             <form className="php-email-form" onSubmit={handleSubmit}>
               <div className="col form-group">
                 <Input
-                  style={{ borderRadius: "0",height:"50px" }}
+                  style={{ borderRadius: "0", height: "50px" }}
                   type="email"
                   name="email"
                   id="email-login"
@@ -128,7 +129,6 @@ alert("error")
               </div>
               <div className="mb-3 col-12 col-lg-12">
                 <Input.Password
-            
                   placeholder="Password"
                   iconRender={(visible) =>
                     visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
@@ -146,7 +146,11 @@ alert("error")
               </div>
 
               <div className="text-center">
-                <button className="btn btn-primary  mb-3" type="submit" style={{width:"92%",height:"50px"}}>
+                <button
+                  className="btn btn-primary  mb-3"
+                  type="submit"
+                  style={{ width: "92%", height: "50px" }}
+                >
                   {isLoading ? <LoadingOutlined /> : "Log in"}
                 </button>
                 <p className="card-text text-muted">

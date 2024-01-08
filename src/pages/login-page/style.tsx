@@ -27,7 +27,7 @@ export const LoginPageStyled = styled.div<LoginPageStyledProps>`
     width: 45%;
     display: grid;
    justify-items:center;
-   align-content:start;
+   align-content:center;
     height: ${({ height }) => height || "100vh"};
     padding: 20px;
   }

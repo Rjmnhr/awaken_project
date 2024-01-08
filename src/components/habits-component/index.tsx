@@ -1,8 +1,9 @@
 import React, { useEffect } from "react";
 import { VideoPlayer } from "../../pages/first-page";
-import welcomeVideo from "../../videos/welcome-video.mp4";
+
 import { CheckOutlined, LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import { videos } from "../video-info";
 
 interface HabitsComponentProps {
   onCompletionChange: (moduleName: string, newStatus: boolean) => void;
@@ -15,25 +16,31 @@ const HabitsComponent: React.FC<HabitsComponentProps> = ({
   onPrevClick,
 }) => {
   const moduleName = "Habits"; // The name of the module
-const navigate = useNavigate();
+  const navigate = useNavigate();
   const [completed, setCompleted] = React.useState<boolean>(false);
 
   const videoNumberMatch = window.location.hash.match(/Video%20(\d+)/);
 
-  const numericVideoNumber = videoNumberMatch ? videoNumberMatch[1] : null;
+  const numericVideoNumber: number = videoNumberMatch
+    ? parseInt(videoNumberMatch[1])
+    : 0;
+  console.log(
+    "🚀 ~ file: index.tsx:25 ~ numericVideoNumber:",
+    numericVideoNumber
+  );
 
   // Load completion status from sessionStorage on component mount
   useEffect(() => {
     const storedCompletedStatus = sessionStorage.getItem(
       `${moduleName}-completedStatus-${numericVideoNumber}`
     );
-      
+
     if (storedCompletedStatus) {
       setCompleted(storedCompletedStatus === "true");
-    }else{
-      setCompleted(false)
+    } else {
+      setCompleted(false);
     }
-  }, [numericVideoNumber,navigate]);
+  }, [numericVideoNumber, navigate]);
   /// Update completion status and sessionStorage when the button is clicked
   const handleButtonClick = () => {
     const newCompletedStatus = !completed;
@@ -86,11 +93,6 @@ const navigate = useNavigate();
         </div>
       </div>
 
-      <p className="mb-3">
-        A narrative paragraph which tells a story of a certain event. A
-        descriptive paragraph which gives details about a person, place thing or
-        idea
-      </p>
       <div className="d-flex w-100 justify-content-between ">
         <div
           className="mb-3 mt-3"
@@ -115,7 +117,7 @@ const navigate = useNavigate();
 
       <div style={{ height: "70%", width: "70%" }}>
         <VideoPlayer
-          src={welcomeVideo}
+          src={videos[1].Habit[numericVideoNumber - 1].url}
           poster={
             "https://res.cloudinary.com/dsw1ubwyh/image/upload/v1702563224/cymfgrw5mkkavedstduo.png"
           }

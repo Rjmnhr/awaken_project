@@ -14,9 +14,6 @@ const OtpVerification: React.FC<OtpVerificationProps> = () => {
   const navigate = useNavigate();
   const inputRefs = useRef<HTMLInputElement[]>([]);
   const email: string | null = sessionStorage.getItem("email") || "";
-  const first_name: string | null = sessionStorage.getItem("first_name") || "";
-  const last_name: string | null = sessionStorage.getItem("last_name") || "";
-  const password: string | null = sessionStorage.getItem("password") || "";
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -81,47 +78,13 @@ const OtpVerification: React.FC<OtpVerificationProps> = () => {
           alert("something wrong");
           return;
         }
-        CreateProfile();
-        navigate("/landing");
+
+        navigate("/payment-checkout");
       })
       .catch((err: AxiosError) => {
         setIsLoading(false);
         setWarning("Invalid OTP");
         console.log(err);
-      });
-  };
-  const clearSessionStorage = () => {
-    sessionStorage.removeItem("email");
-    sessionStorage.removeItem("first_name");
-    sessionStorage.removeItem("last_name");
-    sessionStorage.removeItem("password");
- 
-  };
-  const CreateProfile = () => {
-    const formData = new FormData();
-
-    formData.append("first_name", first_name);
-    formData.append("last_name", last_name);
-    formData.append("email", email);
-    formData.append("password", password);
-
-    AxiosInstance.post("/api/user/signup", formData, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then(async () => {
-    
-     
-
-        clearSessionStorage();
-        navigate("/success-registration")
-      })
-      .catch((err: AxiosError) => {
-        console.log(err);
-        alert("something is wrong");
-
-        navigate("/");
       });
   };
 

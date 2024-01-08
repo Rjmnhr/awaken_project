@@ -18,7 +18,7 @@ const LibraryPage: React.FC = () => {
           <h2
             style={{
               fontWeight: "500",
-              fontFamily: " 'Dancing Script', cursive",
+              fontFamily: "Marmelad",
             }}
           >
             Awaken

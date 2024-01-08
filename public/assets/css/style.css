@@ -11,7 +11,7 @@
 @import './font.css';
 
 body {
-  font-family: 'Avenir Light, sans-serif';
+  font-family: 'Avenir Light';
   color: #444444;
 }
 
@@ -29,7 +29,7 @@ a:hover {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Avenir Light, sans-serif' ;
+  font-family: 'Avenir Light' ;
 }
 
 /*--------------------------------------------------------------
@@ -91,7 +91,7 @@ h1, h2, h3, h4, h5, h6 {
   padding: 0;
   line-height: 1;
   font-weight: 600;
-  font-family: 'Avenir Light, sans-serif';
+  font-family: 'Avenir Light';
 }
 
 #header .logo a {
@@ -142,7 +142,7 @@ h1, h2, h3, h4, h5, h6 {
   transition: 0.3s;
   font-size: 15px;
   font-weight: 600;
-  font-family: 'Avenir Light, sans-serif';
+  font-family: 'Avenir Light';
 }
 
 .nav-menu a:hover, .nav-menu .active > a, .nav-menu li:hover > a {
@@ -393,7 +393,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 #hero .btn-get-started {
-  font-family: 'Avenir Light, sans-serif';
+  font-family: 'Avenir Light';
   font-weight: 500;
   font-size: 16px;
   letter-spacing: 1px;
@@ -1070,7 +1070,7 @@ section {
 .pricing .box h4 {
   font-size: 42px;
   font-weight: 500;
-  font-family: 'Avenir Light, sans-serif';
+  font-family: 'Avenir Light';
   margin-bottom: 20px;
 }
 
@@ -1121,7 +1121,7 @@ section {
   transition: none;
   font-size: 14px;
   font-weight: 400;
-  font-family: 'Avenir Light, sans-serif';
+  font-family: 'Avenir Light';
   font-weight: 600;
   transition: 0.3s;
   border: 2px solid rgba(255, 255, 255, 0.3);
@@ -2046,7 +2046,7 @@ section {
   font-size: 14px;
   line-height: 24px;
   margin-bottom: 0;
-  font-family: 'Avenir Light, sans-serif';
+  font-family: 'Avenir Light';
 }
 
 #footer .footer-top h4 {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useApplicationContext } from "../../context/app-context";
+
 import AxiosInstance from "../axios";
 import { Input, message } from "antd";
 import {
@@ -19,8 +19,6 @@ const SignUp: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isUserExists, setIsUserExists] = useState<boolean>(false);
 
-
-  const { setIsSignIn } = useApplicationContext();
   const [messageApi, contextHolder] = message.useMessage();
 
   const navigate = useNavigate();
@@ -33,7 +31,7 @@ const SignUp: React.FC = () => {
   };
 
   const handleSwitch = () => {
-    setIsSignIn(true);
+    navigate("/");
   };
 
   const checkForExistingUser = async () => {
@@ -80,7 +78,7 @@ const SignUp: React.FC = () => {
         sessionStorage.setItem("first_name", firstName);
         sessionStorage.setItem("last_name", lastName);
         sessionStorage.setItem("password", password);
-      
+
         setIsLoading(false);
         navigate("/otp-validation");
       })
@@ -88,8 +86,7 @@ const SignUp: React.FC = () => {
         console.log(err);
         // Handle the error here
       });
-
-    }
+  };
 
   useEffect(() => {
     if (password && confirmPassword)
@@ -108,7 +105,7 @@ const SignUp: React.FC = () => {
         style={{
           display: "grid",
           placeItems: "center",
-         
+
           marginTop: "20px",
           marginBottom: "20px",
         }}
@@ -125,7 +122,7 @@ const SignUp: React.FC = () => {
                 <div className="d-flex">
                   <div className="col-6 form-group">
                     <input
-                       style={{height:"50px"}}
+                      style={{ height: "50px" }}
                       required
                       type="text"
                       name="first Name"
@@ -140,7 +137,7 @@ const SignUp: React.FC = () => {
                   </div>
                   <div className="col-6 form-group">
                     <input
-                       style={{height:"50px"}}
+                      style={{ height: "50px" }}
                       required
                       type="text"
                       className="form-control"
@@ -154,10 +151,10 @@ const SignUp: React.FC = () => {
                     <div className="validate"></div>
                   </div>
                 </div>
-             
+
                 <div className="col form-group">
                   <input
-                  style={{height:"50px"}}
+                    style={{ height: "50px" }}
                     required
                     type="email"
                     className="form-control"
@@ -169,7 +166,10 @@ const SignUp: React.FC = () => {
                     onChange={(e) => setEmail(e.target.value)}
                   />{" "}
                   {isUserExists ? (
-                    <p className="mt-2" style={{ color: "red", fontSize: "12px" }}>
+                    <p
+                      className="mt-2"
+                      style={{ color: "red", fontSize: "12px" }}
+                    >
                       {" "}
                       User already exists
                     </p>
@@ -216,7 +216,11 @@ const SignUp: React.FC = () => {
                 )}
 
                 <div className="text-center">
-                  <button className="btn btn-primary  mb-3" style={{width:"92%",height:"50px"}} type="submit">
+                  <button
+                    className="btn btn-primary  mb-3"
+                    style={{ width: "92%", height: "50px" }}
+                    type="submit"
+                  >
                     {isLoading ? <LoadingOutlined /> : "Create an account"}
                   </button>
                   <p className="card-text text-muted">

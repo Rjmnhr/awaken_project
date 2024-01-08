@@ -22,7 +22,7 @@
 }
 
 .ant-collapse {
-  font-family: 'Avenir Light, sans-serif';
+  font-family: 'Avenir Light' ;
 }
 
 .collapse-container {
@@ -35,6 +35,18 @@
   max-height: 0;
   transition: max-height 0.3s ease; /* Adjust the duration and easing as needed */
 }
+
+.react-player__play-icon{
+  border-color: transparent transparent transparent white !important;
+  border-width: 32px 0px 32px 52px !important;
+}
+.react-player__preview{
+  background-repeat: no-repeat !important;
+  background-size: contain !important;
+  
+  background-color: rgb(71, 209, 195,0.5)!important;
+}
+
 
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {

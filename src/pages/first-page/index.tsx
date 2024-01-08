@@ -1,16 +1,10 @@
 import { Card, notification, Collapse } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import workBookImg from "../../images/workbook-button.jpg";
 import resourcesImg from "../../images/resource-button.jpg";
 import facebookCommunityImg from "../../images/fb-button.jpg";
-import TaskAltIcon from '@mui/icons-material/TaskAlt';
-import {
-  ArrowLeftOutlined,
-  CaretRightOutlined,
-
-  SearchOutlined,
-} from "@ant-design/icons";
-import { Player, ControlBar } from "video-react";
+import TaskAltIcon from "@mui/icons-material/TaskAlt";
+import { ArrowLeftOutlined, CaretRightOutlined } from "@ant-design/icons";
 import "video-react/dist/video-react.css";
 import WelcomeComponent from "../../components/welcome";
 import DiscoveryComponent from "../../components/discovery-component";
@@ -20,16 +14,17 @@ import ValuesComponent from "../../components/values-component";
 import SpiritualityComponent from "../../components/spirituality-component";
 import ReviewComponent from "../../components/review-component";
 import ConclusionComponent from "../../components/conclusion-component";
-
+import videoPosterImg from "../../images/Awaken-video.png";
 import pdfPathWorkbook from "../../components/download-pdf/awaken-workbook.pdf"; // Update with the correct path
 import pdfPathResources from "../../components/download-pdf/awaken-resources.pdf"; // Update with the correct path
 import { useNavigate } from "react-router-dom";
+import ReactPlayer from "react-player";
 
 const { Panel } = Collapse;
 const modulesArray = [
   {
     title: "Discovery",
-    videos: ["Video 1", ],
+    videos: ["Video 1"],
   },
   {
     title: "Habits",
@@ -37,23 +32,31 @@ const modulesArray = [
   },
   {
     title: "Blocks",
-    videos: ["Video 1", "Video 2", "Video 3","Video 4", "Video 5", "Video 6","Video 7", ],
+    videos: [
+      "Video 1",
+      "Video 2",
+      "Video 3",
+      "Video 4",
+      "Video 5",
+      "Video 6",
+      "Video 7",
+    ],
   },
   {
     title: "Values",
-    videos: ["Video 1", "Video 2", "Video 3","Video 4", "Video 5"],
+    videos: ["Video 1", "Video 2", "Video 3", "Video 4", "Video 5"],
   },
   {
     title: "Spirituality",
-    videos: ["Video 1", "Video 2", "Video 3","Video 4", "Video 5"],
+    videos: ["Video 1", "Video 2", "Video 3", "Video 4", "Video 5"],
   },
   {
     title: "Review",
-    videos: ["Video 1", ],
+    videos: ["Video 1"],
   },
   {
     title: "Conclusion",
-    videos: ["Video 1", ],
+    videos: ["Video 1"],
   },
 ];
 interface RightSidebarItem {
@@ -81,7 +84,7 @@ const moduleComponentsArray = [
 const FirstPage: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const navigate = useNavigate();
-  
+
   //eslint-disable-next-line
   const [forceUpdate, setForceUpdate] = useState(false); // Define the forceUpdate state variable
   const storedUserName = localStorage.getItem("awaken-user-name");
@@ -94,6 +97,30 @@ const FirstPage: React.FC = () => {
   // };
 
   const [api, contextHolder] = notification.useNotification();
+
+  const [isMobile, setIsMobile] = React.useState<boolean>(false);
+
+  useEffect(() => {
+    // Check if the screen width is less than a certain value (e.g., 768px) to determine if it's a mobile device
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setIsMobile(true);
+      } else {
+        setIsMobile(false);
+      }
+    };
+
+    // Add an event listener to handle window resizing
+    window.addEventListener("resize", handleResize);
+
+    // Initial check
+    handleResize();
+
+    // Clean up the event listener when the component unmounts
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []); // Empty dependency array to run the effect only once on mount
 
   const openNotification = (fileName: string) => {
     let content =
@@ -156,14 +183,13 @@ const FirstPage: React.FC = () => {
     const ComponentToRender = moduleComponentsArray[activeIndex];
     return (
       <ComponentToRender
-      
         onCompletionChange={onCompletionChange}
         onNextClick={handleNextClick}
         onPrevClick={handlePrevClick}
       />
     );
   };
-  const isModuleCompleted = (moduleName: string,number:number) => {
+  const isModuleCompleted = (moduleName: string, number: number) => {
     const completedStatus = sessionStorage.getItem(
       `${moduleName}-completedStatus-${number + 1}`
     );
@@ -193,51 +219,48 @@ const FirstPage: React.FC = () => {
         style={{ height: "100vh", background: "#f8f8f8" }}
         className="container-fluid  "
       >
-        <div className="row">
+        <div className="row flex-column-reverse flex-md-row">
           <div
-            style={{ height: "100vh", fontFamily: "'DM Serif Display', serif" ,overflowY:"scroll"}}
-            className="col-md-3 col-lg-2 bg-light sidebar scrollable-container"
+            style={{
+              height: `${isMobile ? "100%" : "100vh"}`,
+              fontWeight: "bold",
+              overflowY: "scroll",
+              alignContent: "space-between",
+              display: "grid",
+            }}
+            className="col-md-3 col-lg-2 bg-light  sidebar scrollable-container"
           >
             {/* Sidebar Content */}
             <div className="py-3 px-2 text-left ">
-              <p onClick={()=>navigate("/library")} style={{ cursor: "pointer" }}>
+              <p
+                onClick={() => navigate("/library")}
+                style={{ cursor: "pointer" }}
+              >
                 <ArrowLeftOutlined className="mr-2" /> Library
               </p>
-              {/* <h2
-                style={{
-                  fontWeight: "500",
-                  fontFamily: " 'Dancing Script', cursive",
-                  fontSize: "50px",
+
+              <h4
+                className={`hover-card ${activeIndex === 0 ? "active" : ""}`}
+                onClick={() => {
+                  setActiveIndex(0);
+                  navigate("/mid-life-journey");
                 }}
-                className="mb-3 "
               >
-                Awaken
-              </h2> */}
-              {/* {sideBarTabs.map((tab) => {
-                return (
-                  <p
-                    style={{ fontWeight: "500" }}
-                    className="d-flex justify-content-between align-items-center"
-                  >
-                    <span>{tab}</span>
-                    <span>
-                      <ArrowRightOutlined />
-                    </span>
-                  </p>
-                );
-              })} */}
-              <h4 className={`hover-card ${activeIndex === 0 ? "active" :""}`} onClick={()=>{
-                setActiveIndex(0)
-                navigate("/mid-life-journey")}}>Introduction</h4>
+                Introduction
+              </h4>
               <Collapse ghost expandIconPosition="right">
                 {modulesArray.map((module, index) => {
                   return (
                     <Panel
                       key={index}
                       header={
-                        <div className={`my-2 hover-card text-left ${activeIndex === index + 1 ? "active" :""}`}>
+                        <div
+                          className={`my-2 hover-card text-left ${
+                            activeIndex === index + 1 ? "active" : ""
+                          }`}
+                        >
                           <div className="card-container">
-                            <h4  className="m-0">{module.title}</h4>
+                            <h4 className="m-0">{module.title}</h4>
                           </div>
                         </div>
                       }
@@ -245,13 +268,20 @@ const FirstPage: React.FC = () => {
                       {module.videos.map((video, videoIndex) => {
                         const isCompleted = isModuleCompleted(
                           module.title,
-                          videoIndex 
+                          videoIndex
                         );
                         return (
-                          <div className="d-flex align-items-center " key={videoIndex}>
+                          <div
+                            className="d-flex align-items-center "
+                            key={videoIndex}
+                          >
                             <a
                               href={`#${video}`}
-                              style={{ cursor: "pointer",color:"black",fontSize:"18px" }}
+                              style={{
+                                cursor: "pointer",
+                                color: "black",
+                                fontSize: "18px",
+                              }}
                               className="pl-0 m-1 "
                               onClick={() => setActiveIndex(index + 1)}
                             >
@@ -264,12 +294,14 @@ const FirstPage: React.FC = () => {
                                 <TaskAltIcon
                                   className="check-tick text-primary"
                                   style={{
-                                   fontSize:"18px",
+                                    fontSize: "18px",
                                     marginLeft: "8px",
                                   }}
                                 />
                               </p>
-                            ) : ""}
+                            ) : (
+                              ""
+                            )}
                             <br />
                           </div>
                         );
@@ -278,6 +310,39 @@ const FirstPage: React.FC = () => {
                   );
                 })}
               </Collapse>
+            </div>
+            <div style={{ fontSize: "11px" }} className="text-left">
+              <p>Video courtesy:</p>
+
+              <p>
+                {" "}
+                Video by Ruvim Miksanskiy: {""}
+                <a href="https://www.pexels.com/video/video-of-forest-1448735/">
+                  https://www.pexels.com/video/video-of-forest-1448735/
+                </a>
+              </p>
+              <p>
+                Video by Kelly :
+                <a href=" https://www.pexels.com/video/a-big-cascading-waterfall-2253462/">
+                  {" "}
+                  https://www.pexels.com/video/a-big-cascading-waterfall-2253462/
+                </a>
+              </p>
+              <p>
+                {" "}
+                Video by Peter Fowler:
+                <a href=" https://www.pexels.com/video/ocean-waves-video-1093652/">
+                  {" "}
+                  https://www.pexels.com/video/ocean-waves-video-1093652/
+                </a>
+              </p>
+              <p>
+                Video by Alex Fu:
+                <a href=" https://www.pexels.com/video/timelapse-of-night-sky-over-lake-3493603/">
+                  {" "}
+                  https://www.pexels.com/video/timelapse-of-night-sky-over-lake-3493603/
+                </a>
+              </p>
             </div>
             {/* Add your sidebar content here */}
           </div>
@@ -326,10 +391,10 @@ const FirstPage: React.FC = () => {
               </div>
               <div className="p-2 text-left">
                 <h3
-                  className="mt-2"
+                  className="mt-2 pl-3x"
                   style={{
                     color: "black",
-                    fontFamily: "'DM Serif Display', serif",
+                    fontWeight: "bold",
                   }}
                 >
                   Welcome {storedUserName}
@@ -337,10 +402,10 @@ const FirstPage: React.FC = () => {
               </div>
               {/* Add your header content here */}
             </header>
-            <div className="row ">
+            <div className="d-md-flex">
               <div
-                className="col-8 pt-1 pr-0  mt-2 scrollable-container"
-                style={{ height: "70vh", overflowY: "scroll" }}
+                className="col-lg-8 col-12 pt-1 pr-0  mt-2 scrollable-container"
+                style={{ maxHeight: "70vh", overflowY: "scroll" }}
               >
                 {renderComponent(
                   handleCompletionChange,
@@ -348,9 +413,12 @@ const FirstPage: React.FC = () => {
                   handlePrevClick
                 )}
               </div>
-              <div className="col-md-3 col-lg-4  mt-2  ">
-                <div className="p-2">
-                  <div className="row m-2 p-1 ">
+              {isMobile ? (
+                ""
+              ) : (
+                <div className="col-md-3 col-lg-4  mt-2 d-lg-block   ">
+                  <div className="p-2">
+                    {/* <div className="row m-2 p-1 ">
                     <SearchOutlined className="pr-2" />
                     <input
                       style={{
@@ -361,36 +429,37 @@ const FirstPage: React.FC = () => {
                       type="text"
                       placeholder="Search for something.."
                     />
-                  </div>
-                  <div
-                    style={{ height: "60vh", overflowY: "scroll" }}
-                    className="scrollable-container"
-                  >
-                    {rightSidebarArray.map((module, index) => {
-                      return (
-                        <Card
-                          onClick={module.action}
-                          style={{
-                            background: `url(${module.url})`,
-                            height: "300px",
-                            backgroundPosition: "center",
-                            cursor: "pointer",
-                            backgroundSize:"contain",
-                            
-                          }}
-                          key={index}
-                          className={`m-2   `}
-                        >
-                          {/* <div className="card-container">
+                  </div> */}
+                    <div
+                      style={{ height: "60vh", overflowY: "scroll" }}
+                      className="scrollable-container "
+                    >
+                      {rightSidebarArray.map((module, index) => {
+                        return (
+                          <Card
+                            onClick={module.action}
+                            style={{
+                              background: `url(${module.url})`,
+                              height: "300px",
+                              backgroundRepeat: "no-repeat",
+                              backgroundPosition: "center",
+                              cursor: "pointer",
+                              backgroundSize: "cover",
+                            }}
+                            key={index}
+                            className={`m-2   `}
+                          >
+                            {/* <div className="card-container">
                             
                             <img style={{width:"100%"}} src ={module.url} alt=""/>
                           </div> */}
-                        </Card>
-                      );
-                    })}
+                          </Card>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
@@ -401,12 +470,59 @@ const FirstPage: React.FC = () => {
 
 export default FirstPage;
 
-export const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, poster }) => {
+// export const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, poster }) => {
+//   return (
+//     <div style={{ width: "100%", height: "80%" }}>
+//       <Player src={src} poster={poster}>
+//         <ControlBar autoHide={false} />
+//       </Player>
+//     </div>
+//   );
+// };
+
+export const VideoPlayer: React.FC<VideoPlayerProps> = ({ src }) => {
+  const [isMobile, setIsMobile] = React.useState<boolean>(false);
+
+  useEffect(() => {
+    // Check if the screen width is less than a certain value (e.g., 768px) to determine if it's a mobile device
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setIsMobile(true);
+      } else {
+        setIsMobile(false);
+      }
+    };
+
+    // Add an event listener to handle window resizing
+    window.addEventListener("resize", handleResize);
+
+    // Initial check
+    handleResize();
+
+    // Clean up the event listener when the component unmounts
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []); // Empty dependency array to run the effect only once on mount
+
+  const youtubeConfig = {
+    playerVars: {
+      color: "white", // Change the color of the player controls
+      modestbranding: 1, // Hide the YouTube logo in the player
+      showinfo: 0, // Hide the "Watch on YouTube" button
+    },
+  };
   return (
-    <div style={{ width: "100%", height: "80%" }}>
-      <Player src={src} poster={poster}>
-        <ControlBar autoHide={false} />
-      </Player>
+    <div>
+      <ReactPlayer
+        width={isMobile ? 320 : 640}
+        height={isMobile ? 180 : 360}
+        url={src}
+        light={videoPosterImg}
+        controls={true}
+        playing={true}
+        config={{ youtube: youtubeConfig }}
+      />
     </div>
   );
 };
