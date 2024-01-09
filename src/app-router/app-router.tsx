@@ -74,7 +74,7 @@ const AppRoute: React.FC = () => {
           path="/payment-checkout"
           element={
             <>
-              <CheckoutComponent price="price_1OWMdqDNZni9rE7F8ZOT7I84" />
+              <CheckoutComponent price="price_1OWWqyDNZni9rE7FcyIA5HOv" />
             </>
           }
         />
