@@ -324,10 +324,12 @@ const FirstPage: React.FC = () => {
       // Move to the previous module when reaching the first video in the current module
       if (activeModuleIndex > 0) {
         setActiveModuleIndex((prevIndex) => prevIndex - 1);
+        const totalVideos = modulesArray[activeModuleIndex - 1].videos.length - 1;
+        setActiveVideoIndex(totalVideos);
       }
+    } else {
+      setActiveVideoIndex(prevVideoIndex);
     }
-
-    setActiveVideoIndex(prevVideoIndex);
   };
 
   return (
