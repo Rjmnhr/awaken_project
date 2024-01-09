@@ -9,19 +9,20 @@ interface DiscoveryComponentProps {
   onNextClick: () => void;
   onPrevClick: () => void;
   userEmail: string;
+  currentVideoIndex: number;
 }
 const DiscoveryComponent: React.FC<DiscoveryComponentProps> = ({
   onCompletionChange,
   onNextClick,
   onPrevClick,
   userEmail,
+  currentVideoIndex,
 }) => {
   const moduleName = "Discovery / Introduction"; // The name of the module
 
   const [completed, setCompleted] = React.useState<boolean>(false);
 
-  const videoNumberMatch = window.location.hash.match(/Video%20(\d+)/);
-  const numericVideoNumber = videoNumberMatch ? videoNumberMatch[1] : 1;
+  const numericVideoNumber = currentVideoIndex;
 
   // Load completion status from sessionStorage on component mount
   useEffect(() => {
@@ -129,7 +130,15 @@ const DiscoveryComponent: React.FC<DiscoveryComponentProps> = ({
         </div>
       </div>
 
-      <div style={{ height: "90%", width: "90%" }}>
+      <div
+        className="text-center"
+        style={{
+          height: "100%",
+          width: "100%",
+          display: "grid",
+          justifyItems: "center",
+        }}
+      >
         <VideoPlayer
           src={videos[0]?.Discovery[0]?.url}
           poster={

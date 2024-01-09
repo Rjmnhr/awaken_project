@@ -135,20 +135,25 @@ export const videos: VideoCategory[] = [
     ],
   },
   {
-    Review: [
+    ReviewConclusion: [
       {
         videoNo: "1",
         url: "https://www.youtube.com/watch?v=dXLotseIXZ0",
         videoID: "dXLotseIXZ0",
       },
+      {
+        videoNo: "2",
+        url: "https://www.youtube.com/watch?v=7TSfMwjzAno",
+        videoID: "7TSfMwjzAno",
+      },
     ],
   },
   {
-    Conclusion: [
+    Completion: [
       {
         videoNo: "1",
-        url: "https://www.youtube.com/watch?v=7TSfMwjzAno",
-        videoID: "7TSfMwjzAno",
+        url: "https://www.youtube.com/watch?v=Hw0C5sRKj2o",
+        videoID: "Hw0C5sRKj2o",
       },
     ],
   },

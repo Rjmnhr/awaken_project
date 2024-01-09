@@ -1,6 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import headerImg from "../../images/top-header-photo.jpg";
+import Footer from "../../components/footer";
+
 const LibraryPage: React.FC = () => {
   const navigate = useNavigate();
 
@@ -36,7 +38,7 @@ const LibraryPage: React.FC = () => {
           </div>
         </div>
       </nav>
-      <div className="container-fluid bg-light" style={{ minHeight: "100vh" }}>
+      <div className="container-fluid bg-light" style={{ minHeight: "75vh" }}>
         <div className="pt-3 container text-left">
           <div style={{ borderBottom: "2px solid gray" }}>
             <h1 className="mb-3">Your Library</h1>
@@ -105,6 +107,7 @@ const LibraryPage: React.FC = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </>
   );
 };

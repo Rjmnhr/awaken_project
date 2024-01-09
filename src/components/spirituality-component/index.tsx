@@ -8,68 +8,65 @@ interface SpiritualityComponentProps {
   onCompletionChange: (moduleName: string, newStatus: boolean) => void;
   onNextClick: () => void;
   onPrevClick: () => void;
-  userEmail: string
+  userEmail: string;
+  currentVideoIndex: number;
 }
 const SpiritualityComponent: React.FC<SpiritualityComponentProps> = ({
   onCompletionChange,
   onNextClick,
   onPrevClick,
-  userEmail
+  userEmail,
+  currentVideoIndex,
 }) => {
   const moduleName = "Spirituality"; // The name of the module
   const [completed, setCompleted] = React.useState<boolean>(false);
 
-  const videoNumberMatch = window.location.hash.match(/Video%20(\d+)/);
-
-  const numericVideoNumber = videoNumberMatch
-    ? parseInt(videoNumberMatch[1])
-    : 0;
-
-    useEffect(() => {
-      const fetchCompletionStatus = async () => {
-        try {
-          // Make the POST request with formData including moduleName, numericVideoNumber, and email
-  
-          const response = await AxiosInstance.post(
-            "/api/completion/video-completion-status",
-            {
-              email: userEmail,
-              module: moduleName,
-              videoNo: numericVideoNumber,
-            }
-          );
-  
-          setCompleted(response.data.completed || false);
-          // Call the callback function to update the completion status in the parent component
-          onCompletionChange(moduleName, response.data.completed || false);
-        } catch (error) {
-          console.error("Error fetching completion status:", error);
-        }
-      };
-  
-      fetchCompletionStatus();
-      //eslint-disable-next-line
-    }, [numericVideoNumber, moduleName, userEmail]);
-    const handleButtonClick = async () => {
-      const newCompletedStatus = !completed;
-      setCompleted(newCompletedStatus);
-  
+  const numericVideoNumber = currentVideoIndex;
+  useEffect(() => {
+    const fetchCompletionStatus = async () => {
       try {
-        await AxiosInstance.post(`/api/completion/update-video-completion`, {
-          email: userEmail,
-          module: moduleName,
-          videoNo: numericVideoNumber,
-          status: newCompletedStatus,
-        });
-        sessionStorage.setItem(
-          `${moduleName}-completedStatus-${numericVideoNumber}`,
-          String(newCompletedStatus)
+        // Make the POST request with formData including moduleName, numericVideoNumber, and email
+
+        const response = await AxiosInstance.post(
+          "/api/completion/video-completion-status",
+          {
+            email: userEmail,
+            module: moduleName,
+            videoNo: numericVideoNumber,
+          }
         );
-        onCompletionChange(moduleName, newCompletedStatus);
+
+        setCompleted(response.data.completed || false);
+        // Call the callback function to update the completion status in the parent component
+        onCompletionChange(moduleName, response.data.completed || false);
       } catch (error) {
-        console.error("Error updating completion status:", error);
+        console.error("Error fetching completion status:", error);
       }
     };
+
+    fetchCompletionStatus();
+    //eslint-disable-next-line
+  }, [numericVideoNumber, moduleName, userEmail]);
+  const handleButtonClick = async () => {
+    const newCompletedStatus = !completed;
+    setCompleted(newCompletedStatus);
+
+    try {
+      await AxiosInstance.post(`/api/completion/update-video-completion`, {
+        email: userEmail,
+        module: moduleName,
+        videoNo: numericVideoNumber,
+        status: newCompletedStatus,
+      });
+      sessionStorage.setItem(
+        `${moduleName}-completedStatus-${numericVideoNumber}`,
+        String(newCompletedStatus)
+      );
+      onCompletionChange(moduleName, newCompletedStatus);
+    } catch (error) {
+      console.error("Error updating completion status:", error);
+    }
+  };
 
   // Handle "Next" button click
   const handleNextClick = () => {
@@ -132,7 +129,15 @@ const SpiritualityComponent: React.FC<SpiritualityComponentProps> = ({
         </div>
       </div>
 
-      <div style={{ height: "70%", width: "70%" }}>
+      <div
+        className="text-center"
+        style={{
+          height: "100%",
+          width: "100%",
+          display: "grid",
+          justifyItems: "center",
+        }}
+      >
         <VideoPlayer
           src={videos[4]?.Spirituality[numericVideoNumber - 1]?.url}
           poster={

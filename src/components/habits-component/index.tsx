@@ -8,6 +8,8 @@ interface HabitsComponentProps {
   onCompletionChange: (moduleName: string, newStatus: boolean) => void;
   onNextClick: () => void;
   onPrevClick: () => void;
+  currentVideoIndex: number;
+
   userEmail: string;
 }
 const HabitsComponent: React.FC<HabitsComponentProps> = ({
@@ -15,17 +17,13 @@ const HabitsComponent: React.FC<HabitsComponentProps> = ({
   onNextClick,
   onPrevClick,
   userEmail,
+  currentVideoIndex,
 }) => {
   const moduleName = "Habits"; // The name of the module
 
   const [completed, setCompleted] = React.useState<boolean>(false);
 
-  const videoNumberMatch = window.location.hash.match(/Video%20(\d+)/);
-
-  const numericVideoNumber: number = videoNumberMatch
-    ? parseInt(videoNumberMatch[1])
-    : 0;
-
+  const numericVideoNumber: number = currentVideoIndex;
   useEffect(() => {
     const fetchCompletionStatus = async () => {
       try {
@@ -41,8 +39,6 @@ const HabitsComponent: React.FC<HabitsComponentProps> = ({
         );
 
         setCompleted(response.data.completed || false);
-      
- 
       } catch (error) {
         console.error("Error fetching completion status:", error);
       }
@@ -133,7 +129,15 @@ const HabitsComponent: React.FC<HabitsComponentProps> = ({
         </div>
       </div>
 
-      <div style={{ height: "70%", width: "70%" }}>
+      <div
+        className="text-center"
+        style={{
+          height: "100%",
+          width: "100%",
+          display: "grid",
+          justifyItems: "center",
+        }}
+      >
         <VideoPlayer
           src={videos[1]?.Habit[numericVideoNumber - 1]?.url}
           poster={

@@ -1,4 +1,4 @@
-import { Card, notification, Collapse } from "antd";
+import { Card, notification, Collapse, Popconfirm } from "antd";
 import React, { useEffect, useState } from "react";
 import workBookImg from "../../images/workbook-button.jpg";
 import resourcesImg from "../../images/resource-button.jpg";
@@ -7,7 +7,11 @@ import workBookIcon from "../../images/notebook.png";
 import resourcesIcon from "../../images/hiring.png";
 import facebookCommunityIcon from "../../images/facebook-2.png";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
-import { ArrowLeftOutlined, CaretRightOutlined } from "@ant-design/icons";
+import {
+  ArrowLeftOutlined,
+  CaretRightOutlined,
+  CloudDownloadOutlined,
+} from "@ant-design/icons";
 import "video-react/dist/video-react.css";
 import headerImg from "../../images/top-header-photo.jpg";
 import DiscoveryComponent from "../../components/discovery-component";
@@ -16,13 +20,14 @@ import BlocksComponent from "../../components/blocks-component";
 import ValuesComponent from "../../components/values-component";
 import SpiritualityComponent from "../../components/spirituality-component";
 import ReviewComponent from "../../components/review-component";
-import ConclusionComponent from "../../components/conclusion-component";
+import CompletionComponent from "../../components/oncompletion-component";
 import videoPosterImg from "../../images/Awaken-video.png";
 import pdfPathWorkbook from "../../components/download-pdf/awaken-workbook.pdf"; // Update with the correct path
 import pdfPathResources from "../../components/download-pdf/awaken-resources.pdf"; // Update with the correct path
 import { useNavigate } from "react-router-dom";
 import ReactPlayer from "react-player";
 import AxiosInstance from "../../components/axios";
+import Footer from "../../components/footer";
 
 const { Panel } = Collapse;
 const modulesArray = [
@@ -55,11 +60,11 @@ const modulesArray = [
     videos: ["Video 1", "Video 2", "Video 3", "Video 4", "Video 5"],
   },
   {
-    title: "Review",
-    videos: ["Video 1"],
+    title: "Review / Conclusion",
+    videos: ["Video 1", "Video 2"],
   },
   {
-    title: "Conclusion",
+    title: "On Completion",
     videos: ["Video 1"],
   },
 ];
@@ -68,6 +73,8 @@ interface RightSidebarItem {
   url: string;
   action?: () => void; // Function to execute when clicked
   icon: string;
+  modalTitle: string; // Add modal title
+  modalContent: React.ReactNode; // Add modal content
 }
 
 interface VideoPlayerProps {
@@ -82,11 +89,12 @@ const moduleComponentsArray = [
   ValuesComponent,
   SpiritualityComponent,
   ReviewComponent,
-  ConclusionComponent,
+  CompletionComponent,
 ];
 
 const FirstPage: React.FC = () => {
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeModuleIndex, setActiveModuleIndex] = useState(0);
+  const [activeVideoIndex, setActiveVideoIndex] = useState(0);
   const navigate = useNavigate();
   const userEmail = localStorage.getItem("awaken-user-email") || "";
   //eslint-disable-next-line
@@ -94,6 +102,7 @@ const FirstPage: React.FC = () => {
   const storedUserName = localStorage.getItem("awaken-user-name");
   const [completionStatuses, setCompletionStatuses] = useState<any[]>([]);
   const [api, contextHolder] = notification.useNotification();
+
   const [isMobile, setIsMobile] = React.useState<boolean>(false);
 
   useEffect(() => {
@@ -128,6 +137,12 @@ const FirstPage: React.FC = () => {
     });
   };
 
+  const alertNotification = () => {
+    api.error({
+      message: `You have videos left to complete`,
+    });
+  };
+
   // Define the downloadPdf function outside the component
   const downloadPdf = (pdfPath: string, fileName: string) => {
     openNotification(fileName);
@@ -143,6 +158,12 @@ const FirstPage: React.FC = () => {
       url: workBookImg,
       action: () => downloadPdf(pdfPathWorkbook, "awaken-workbook.pdf"),
       icon: workBookIcon,
+      modalTitle: "Download Workbook",
+      modalContent: (
+        <p style={{ maxWidth: "200px" }}>
+          Are you sure you want to download the Awaken Workbook?
+        </p>
+      ),
     },
     {
       title: "Facebook community",
@@ -153,12 +174,24 @@ const FirstPage: React.FC = () => {
           "_blank"
         ),
       icon: facebookCommunityIcon,
+      modalTitle: "Visit Facebook Community",
+      modalContent: (
+        <p style={{ maxWidth: "200px" }}>
+          Are you sure you want to visit the Awaken Facebook Community?
+        </p>
+      ),
     },
     {
       title: "Resources",
       url: resourcesImg,
       action: () => downloadPdf(pdfPathResources, "resources.pdf"),
       icon: resourcesIcon,
+      modalTitle: "Download Resources",
+      modalContent: (
+        <p style={{ maxWidth: "200px" }}>
+          Are you sure you want to download the Awaken Resources?
+        </p>
+      ),
     },
   ];
 
@@ -174,13 +207,15 @@ const FirstPage: React.FC = () => {
     handleNextClick: () => void,
     handlePrevClick: () => void
   ) => {
-    const ComponentToRender = moduleComponentsArray[activeIndex];
+    const ComponentToRender = moduleComponentsArray[activeModuleIndex];
+    const currentVideoIndex = activeVideoIndex + 1;
     return (
       <ComponentToRender
         onCompletionChange={onCompletionChange}
         onNextClick={handleNextClick}
         onPrevClick={handlePrevClick}
         userEmail={userEmail}
+        currentVideoIndex={currentVideoIndex}
       />
     );
   };
@@ -188,6 +223,15 @@ const FirstPage: React.FC = () => {
     try {
       const completionStatuses = await Promise.all(
         modulesArray.map(async (module, index) => {
+          if (module.title === "On Completion") {
+            // Skip checking the "On Completion" module
+            return {
+              moduleTitle: module.title,
+              moduleCompleted: true,
+              videoStatuses: [],
+            };
+          }
+
           const videoCompletionStatuses = await Promise.all(
             module.videos.map(async (video, videoIndex) => {
               const response = await AxiosInstance.post(
@@ -202,18 +246,37 @@ const FirstPage: React.FC = () => {
             })
           );
 
+          const moduleCompleted = videoCompletionStatuses.every(
+            (status) => status
+          );
+
           return {
             moduleTitle: module.title,
+            moduleCompleted: moduleCompleted,
             videoStatuses: videoCompletionStatuses,
           };
         })
       );
 
+      // Check if all modules (excluding the "On Completion" module) are completed
+      const allModulesCompleted = completionStatuses.every(
+        (module) => module.moduleCompleted
+      );
+      console.log(
+        "🚀 ~ loadCompletionStatuses ~ allModulesCompleted:",
+        allModulesCompleted
+      );
+
+      // Set the state variable based on the overall completion
       setCompletionStatuses(completionStatuses);
+      setOverallCompletion(allModulesCompleted);
     } catch (error) {
       console.error("Error fetching completion statuses:", error);
     }
   };
+
+  // Assuming you have a state variable to store the overall completion status
+  const [overallCompletion, setOverallCompletion] = useState(false);
 
   const isModuleCompleted = (moduleName: string, videoIndex: number) => {
     const completedStatus = sessionStorage.getItem(
@@ -235,51 +298,36 @@ const FirstPage: React.FC = () => {
   useEffect(() => {
     loadCompletionStatuses();
     // eslint-disable-next-line
-  }, [userEmail]);
+  }, [userEmail, forceUpdate]);
 
   const handleNextClick = () => {
-    const currentModule = modulesArray[activeIndex];
+    const currentModule = modulesArray[activeModuleIndex];
     const totalVideos = currentModule.videos.length;
+    const nextVideoIndex = (activeVideoIndex + 1) % totalVideos;
 
-    const currentVideoIndex =
-      parseInt(window.location.hash.replace("#Video%20", ""), 10) || 1;
-    const nextVideoIndex = (currentVideoIndex % totalVideos) + 1;
-
-    if (nextVideoIndex === 1) {
+    if (nextVideoIndex === 0) {
       // Move to the next module when reaching the last video in the current module
-      if (activeIndex < modulesArray.length - 1) {
-        setActiveIndex((prevIndex) => prevIndex + 1);
-        navigate(`#Video%201`);
+      if (activeModuleIndex < modulesArray.length - 1) {
+        setActiveModuleIndex((prevIndex) => prevIndex + 1);
       }
-    } else {
-      // Move to the next video within the current module
-      navigate(`#Video%20${nextVideoIndex}`);
     }
+
+    setActiveVideoIndex(nextVideoIndex);
   };
 
   const handlePrevClick = () => {
-    const currentModule = modulesArray[activeIndex];
-
-    const totalVideos = currentModule.videos.length;
-
-    const currentVideoIndex =
-      parseInt(window.location.hash.replace("#Video%20", ""), 10) || 1;
     const prevVideoIndex =
-      ((currentVideoIndex - 2 + totalVideos) % totalVideos) + 1;
+      (activeVideoIndex - 1 + modulesArray[activeModuleIndex].videos.length) %
+      modulesArray[activeModuleIndex].videos.length;
 
-    if (prevVideoIndex === totalVideos) {
+    if (prevVideoIndex === modulesArray[activeModuleIndex].videos.length - 1) {
       // Move to the previous module when reaching the first video in the current module
-      if (activeIndex > 0) {
-        setActiveIndex((prevIndex) => prevIndex - 1);
-        const currentModule = modulesArray[activeIndex - 1];
-        const totalVideos = currentModule.videos.length;
-        navigate(`#Video%20${totalVideos}`);
+      if (activeModuleIndex > 0) {
+        setActiveModuleIndex((prevIndex) => prevIndex - 1);
       }
-    } else {
-      navigate(`#Video%20${prevVideoIndex}`);
-
-      // Move to the previous video within the current module
     }
+
+    setActiveVideoIndex(prevVideoIndex);
   };
 
   return (
@@ -317,11 +365,28 @@ const FirstPage: React.FC = () => {
                       header={
                         <div
                           className={`my-2 hover-card text-left ${
-                            activeIndex === index ? "active" : ""
+                            activeModuleIndex === index ? "active" : ""
                           }`}
                         >
                           <div className="card-container tex-left">
-                            <h4 className="m-0 text-left">{module.title}</h4>
+                            <h4
+                              onClick={() => {
+                                if (module.title === "On Completion") {
+                                  if (overallCompletion) {
+                                    setActiveModuleIndex(index);
+                                    setActiveVideoIndex(0);
+                                  } else {
+                                    alertNotification();
+                                  }
+                                } else {
+                                  setActiveModuleIndex(index);
+                                  setActiveVideoIndex(0);
+                                }
+                              }}
+                              className="m-0 text-left"
+                            >
+                              {module.title}
+                            </h4>
                           </div>
                         </div>
                       }
@@ -336,27 +401,39 @@ const FirstPage: React.FC = () => {
                             className="d-flex align-items-center "
                             key={videoIndex}
                           >
-                            <a
-                              href={`#${video}`}
+                            <p
                               style={{
                                 cursor: "pointer",
                                 color: "black",
                                 fontSize: "18px",
                               }}
                               className="pl-0 m-1 "
-                              onClick={() => setActiveIndex(index)}
+                              onClick={() => {
+                                if (module.title === "On Completion") {
+                                  if (overallCompletion) {
+                                    setActiveVideoIndex(videoIndex);
+                                    setActiveModuleIndex(index);
+                                  } else {
+                                    alertNotification();
+                                  }
+                                } else {
+                                  setActiveVideoIndex(videoIndex);
+                                  setActiveModuleIndex(index);
+                                }
+                              }}
                             >
                               <CaretRightOutlined className="mr-1 " />
                               {video}
-                            </a>
+                            </p>
                             {isCompleted ? (
                               <p className="m-0">
                                 {" "}
                                 <TaskAltIcon
-                                  className="check-tick text-primary"
+                                  className="check-tick "
                                   style={{
                                     fontSize: "18px",
                                     marginLeft: "8px",
+                                    color: "#e0af2a",
                                   }}
                                 />
                               </p>
@@ -373,7 +450,7 @@ const FirstPage: React.FC = () => {
               </Collapse>
             </div>
             {isMobile ? (
-              <div style={{ fontSize: "8px" }} className="text-left mb-3">
+              <div style={{ fontSize: "8px" }} className="text-left mb-3 mt-3">
                 <p className="mb-1">Video courtesy:</p>
 
                 <p className="m-0">
@@ -409,6 +486,8 @@ const FirstPage: React.FC = () => {
             ) : (
               ""
             )}
+
+            {isMobile ? <Footer /> : ""}
             {/* Add your sidebar content here */}
           </div>
 
@@ -476,10 +555,24 @@ const FirstPage: React.FC = () => {
                   handleNextClick,
                   handlePrevClick
                 )}
+
+                <p
+                  onClick={() =>
+                    downloadPdf(pdfPathWorkbook, "awaken-workbook.pdf")
+                  }
+                  style={{ fontWeight: "bold", cursor: "pointer" }}
+                  className="text-center text-primary"
+                >
+                  Download Work Book <CloudDownloadOutlined />
+                </p>
+
                 {isMobile ? (
                   ""
                 ) : (
-                  <div style={{ fontSize: "8px" }} className="text-left mb-3">
+                  <div
+                    style={{ fontSize: "8px" }}
+                    className="text-left mb-3 mt-5 container"
+                  >
                     <p className="mb-1">Video courtesy:</p>
 
                     <p className="m-0">
@@ -513,6 +606,7 @@ const FirstPage: React.FC = () => {
                     </p>
                   </div>
                 )}
+                {isMobile ? "" : <Footer />}
               </div>
               {isMobile ? (
                 <div>
@@ -532,21 +626,25 @@ const FirstPage: React.FC = () => {
 
                     {rightSidebarArray.map((module, index) => {
                       return (
-                        <div
-                          onClick={module.action}
-                          key={index}
-                          className={`m-2   `}
+                        <Popconfirm
+                          title={module.modalTitle}
+                          description={module.modalContent}
+                          onConfirm={module.action}
+                          okText="Yes"
+                          cancelText="No"
                         >
-                          <img
-                            style={{ width: "30px" }}
-                            src={module.icon}
-                            alt=""
-                            className="mb-2"
-                          />
-                          <label style={{ fontSize: "14px" }}>
-                            {module.title}
-                          </label>
-                        </div>
+                          <div key={index} className={`m-2   `}>
+                            <img
+                              style={{ width: "30px" }}
+                              src={module.icon}
+                              alt=""
+                              className="mb-2"
+                            />
+                            <label style={{ fontSize: "14px" }}>
+                              {module.title}
+                            </label>
+                          </div>
+                        </Popconfirm>
                       );
                     })}
                   </div>
@@ -572,24 +670,32 @@ const FirstPage: React.FC = () => {
                     >
                       {rightSidebarArray.map((module, index) => {
                         return (
-                          <Card
-                            onClick={module.action}
-                            style={{
-                              background: `url(${module.url})`,
-                              height: "300px",
-                              backgroundRepeat: "no-repeat",
-                              backgroundPosition: "center",
-                              cursor: "pointer",
-                              backgroundSize: "cover",
-                            }}
-                            key={index}
-                            className={`m-2   `}
+                          <Popconfirm
+                            title={module.modalTitle}
+                            description={module.modalContent}
+                            onConfirm={module.action}
+                            okText="Yes"
+                            cancelText="No"
                           >
-                            {/* <div className="card-container">
+                            <Card
+                              style={{
+                                backgroundImage: `url(${module.url})`,
+                                height: "300px",
+
+                                backgroundRepeat: "no-repeat",
+                                backgroundPosition: "center",
+                                cursor: "pointer",
+                                backgroundSize: "contain",
+                              }}
+                              key={index}
+                              className={`m-2   `}
+                            >
+                              {/* <div className="card-container">
                             
                             <img style={{width:"100%"}} src ={module.url} alt=""/>
                           </div> */}
-                          </Card>
+                            </Card>
+                          </Popconfirm>
                         );
                       })}
                     </div>
