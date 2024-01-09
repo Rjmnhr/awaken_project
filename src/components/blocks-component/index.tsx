@@ -8,13 +8,13 @@ interface BlocksComponentProps {
   onCompletionChange: (moduleName: string, newStatus: boolean) => void;
   onNextClick: () => void;
   onPrevClick: () => void;
-  userEmail :string
+  userEmail: string;
 }
 const BlocksComponent: React.FC<BlocksComponentProps> = ({
   onCompletionChange,
   onNextClick,
   onPrevClick,
-  userEmail
+  userEmail,
 }) => {
   const moduleName = "Blocks"; // The name of the module
 
@@ -26,51 +26,49 @@ const BlocksComponent: React.FC<BlocksComponentProps> = ({
     ? parseInt(videoNumberMatch[1])
     : 0;
 
-    useEffect(() => {
-      const fetchCompletionStatus = async () => {
-        try {
-          // Make the POST request with formData including moduleName, numericVideoNumber, and email
-  
-          const response = await AxiosInstance.post(
-            "/api/completion/video-completion-status",
-            {
-              email: userEmail,
-              module: moduleName,
-              videoNo: numericVideoNumber,
-            }
-          );
-  
-          setCompleted(response.data.completed || false);
-          // Call the callback function to update the completion status in the parent component
-          onCompletionChange(moduleName, response.data.completed || false);
-        } catch (error) {
-          console.error("Error fetching completion status:", error);
-        }
-      };
-  
-      fetchCompletionStatus();
-      //eslint-disable-next-line
-    }, [numericVideoNumber, moduleName, userEmail]);
-    const handleButtonClick = async () => {
-      const newCompletedStatus = !completed;
-      setCompleted(newCompletedStatus);
-  
+  useEffect(() => {
+    const fetchCompletionStatus = async () => {
       try {
-        await AxiosInstance.post(`/api/completion/update-video-completion`, {
-          email: userEmail,
-          module: moduleName,
-          videoNo: numericVideoNumber,
-          status: newCompletedStatus,
-        });
-        sessionStorage.setItem(
-          `${moduleName}-completedStatus-${numericVideoNumber}`,
-          String(newCompletedStatus)
+        // Make the POST request with formData including moduleName, numericVideoNumber, and email
+
+        const response = await AxiosInstance.post(
+          "/api/completion/video-completion-status",
+          {
+            email: userEmail,
+            module: moduleName,
+            videoNo: numericVideoNumber,
+          }
         );
-        onCompletionChange(moduleName, newCompletedStatus);
+
+        setCompleted(response.data.completed || false);
       } catch (error) {
-        console.error("Error updating completion status:", error);
+        console.error("Error fetching completion status:", error);
       }
     };
+
+    fetchCompletionStatus();
+    //eslint-disable-next-line
+  }, [numericVideoNumber, moduleName, userEmail]);
+  const handleButtonClick = async () => {
+    const newCompletedStatus = !completed;
+    setCompleted(newCompletedStatus);
+
+    try {
+      await AxiosInstance.post(`/api/completion/update-video-completion`, {
+        email: userEmail,
+        module: moduleName,
+        videoNo: numericVideoNumber,
+        status: newCompletedStatus,
+      });
+      sessionStorage.setItem(
+        `${moduleName}-completedStatus-${numericVideoNumber}`,
+        String(newCompletedStatus)
+      );
+      onCompletionChange(moduleName, newCompletedStatus);
+    } catch (error) {
+      console.error("Error updating completion status:", error);
+    }
+  };
   // Handle "Next" button click
   const handleNextClick = () => {
     // Call the callback function to update the active index in the parent component

@@ -41,8 +41,8 @@ const HabitsComponent: React.FC<HabitsComponentProps> = ({
         );
 
         setCompleted(response.data.completed || false);
-        // Call the callback function to update the completion status in the parent component
-        onCompletionChange(moduleName, response.data.completed || false);
+      
+ 
       } catch (error) {
         console.error("Error fetching completion status:", error);
       }

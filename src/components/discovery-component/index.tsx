@@ -8,18 +8,19 @@ interface DiscoveryComponentProps {
   onCompletionChange: (moduleName: string, newStatus: boolean) => void;
   onNextClick: () => void;
   onPrevClick: () => void;
+  userEmail: string;
 }
 const DiscoveryComponent: React.FC<DiscoveryComponentProps> = ({
   onCompletionChange,
   onNextClick,
   onPrevClick,
+  userEmail,
 }) => {
-  const moduleName = "Discovery"; // The name of the module
+  const moduleName = "Discovery / Introduction"; // The name of the module
 
   const [completed, setCompleted] = React.useState<boolean>(false);
 
   const videoNumberMatch = window.location.hash.match(/Video%20(\d+)/);
-  const userEmail = localStorage.getItem("awaken-user-email");
   const numericVideoNumber = videoNumberMatch ? videoNumberMatch[1] : 1;
 
   // Load completion status from sessionStorage on component mount
@@ -38,13 +39,6 @@ const DiscoveryComponent: React.FC<DiscoveryComponentProps> = ({
         );
 
         setCompleted(response.data.completed || false);
-        sessionStorage.setItem(
-          `${moduleName}-completedStatus-${numericVideoNumber}`,
-          String(response.data.completed || false)
-        );
-        setCompleted(response.data.completed || false);
-        // Call the callback function to update the completion status in the parent component
-        onCompletionChange(moduleName, response.data.completed || false);
       } catch (error) {
         console.error("Error fetching completion status:", error);
       }
@@ -64,7 +58,10 @@ const DiscoveryComponent: React.FC<DiscoveryComponentProps> = ({
         videoNo: numericVideoNumber,
         status: newCompletedStatus,
       });
-
+      sessionStorage.setItem(
+        `${moduleName}-completedStatus-${1}`,
+        String(newCompletedStatus)
+      );
       onCompletionChange(moduleName, newCompletedStatus);
     } catch (error) {
       console.error("Error updating completion status:", error);
