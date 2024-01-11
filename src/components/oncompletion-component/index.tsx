@@ -1,6 +1,5 @@
 import React from "react";
 import { VideoPlayer } from "../../pages/first-page";
-import successTick from "../../images/check-soft-bg.svg";
 import { videos } from "../video-info";
 
 interface CompletionComponentProps {
@@ -15,16 +14,13 @@ const CompletionComponent: React.FC<CompletionComponentProps> = ({
     <div className=" p-3 text-left " data-aos="fade-left">
       <div>
         <div className="d-flex justify-content-center flex-wrap align-content-center">
-          <p style={{fontSize:"30px"}} className=" mb-5">
+          <p style={{ fontSize: "25px" }} className=" mb-5">
             {" "}
-            <strong>Congrats! you have completed </strong>
-            <img
-              style={{ marginLeft: "10px" }}
-              src={successTick}
-              alt=""
-              width={50}
-              height={50}
-            />{" "}
+            <strong>
+              Congratulations! I am so glad you have completed your journey. I
+              wish you all the very best for your onward path. Sending you love
+              and light, Ansua
+            </strong>
           </p>
         </div>
       </div>
