@@ -1,4 +1,4 @@
-import React, { useState, useRef, ChangeEvent, KeyboardEvent } from "react";
+import React, { useState, ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { OtpVerificationPageStyled } from "./style";
 import AxiosInstance from "../axios";
@@ -10,66 +10,28 @@ interface OtpVerificationProps {}
 
 const OtpVerification: React.FC<OtpVerificationProps> = () => {
   const [warning, setWarning] = useState<string>("");
-  const [otpPin, setOtpPin] = useState<string[]>(Array(6).fill(""));
+  const [otpPin, setOtpPin] = useState<string>("");
   const navigate = useNavigate();
-  const inputRefs = useRef<HTMLInputElement[]>([]);
+
   const email: string | null = sessionStorage.getItem("email") || "";
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const handleInputChange = (
-    index: number,
-    event: ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const input = event.target.value;
 
-    if (/^\d?$/.test(input)) {
-      const updatedOtpPin = [...otpPin];
-      updatedOtpPin[index] = input;
-
-      if (input && index < 5 && inputRefs.current[index + 1]) {
-        inputRefs.current[index + 1].focus();
-      }
-      setOtpPin(updatedOtpPin);
-    }
-  };
-
-  const handleKeyDown = (
-    index: number,
-    event: KeyboardEvent<HTMLInputElement>
-  ) => {
-    if (event.key === "Backspace" && otpPin[index] === "") {
-      const updatedOtpPin = [...otpPin];
-      updatedOtpPin[index - 1] = "";
-
-      setOtpPin(updatedOtpPin);
-
-      if (index > 0 && inputRefs.current[index - 1]) {
-        inputRefs.current[index - 1].focus();
-      }
-    } else if (
-      event.key === "ArrowRight" &&
-      index < 5 &&
-      otpPin[index] !== ""
-    ) {
-      if (inputRefs.current[index + 1]) {
-        inputRefs.current[index + 1].focus();
-      }
-    } else if (event.key === "ArrowLeft" && index > 0) {
-      if (inputRefs.current[index - 1]) {
-        inputRefs.current[index - 1].focus();
-      }
+    if (/^\d{0,6}$/.test(input)) {
+      setOtpPin(input);
     }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     setIsLoading(true);
     e.preventDefault();
-    const joinedOtpPin = otpPin.join("");
 
     AxiosInstance.post("/api/otp/verify-otp", {
       email: email,
-      otp: joinedOtpPin,
+      otp: otpPin,
     })
       .then(async (response: AxiosResponse) => {
         setIsLoading(false);
@@ -112,37 +74,26 @@ const OtpVerification: React.FC<OtpVerificationProps> = () => {
               </p>
             </div>
             <form onSubmit={handleSubmit}>
-              {otpPin.map((otp, index) => (
-                <input
-                  style={{
-                    width: "20px",
-                    background: "none",
-                    border: "none",
-                    borderBottom: "1px solid black",
-                    outline: "none",
-                  }}
-                  key={index}
-                  type="number"
-                  id={`otp-${index}`}
-                  ref={(ref) => ref && (inputRefs.current[index] = ref)}
-                  value={otp}
-                  onChange={(event) => handleInputChange(index, event)}
-                  onKeyDown={(event) => handleKeyDown(index, event)}
-                  maxLength={1}
-                />
-              ))}
-
+              <input
+                className="p-1"
+                placeholder="OTP"
+                type="text"
+                id="otp"
+                value={otpPin}
+                onChange={handleChange}
+                maxLength={6}
+              />
               <p style={{ color: "red" }}>{warning}</p>
               <br />
 
               {otpPin.length > 5 ? (
-                <button className="btn btn-primary btn-lg" type="submit">
+                <button className="btn btn-primary " type="submit">
                   {isLoading ? <LoadingOutlined /> : "Verify"}
                 </button>
               ) : (
                 <button
                   disabled
-                  className="btn btn-primary btn-lg"
+                  className="btn btn-primary "
                   type="submit"
                 >
                   {isLoading ? <LoadingOutlined /> : "Verify"}
