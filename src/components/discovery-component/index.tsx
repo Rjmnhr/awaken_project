@@ -108,6 +108,12 @@ const DiscoveryComponent: React.FC<DiscoveryComponentProps> = ({
         </div>
       </div>
 
+      <p>
+        In the discovery and introductory video, you will asked to do the
+        self-assessment in your workbook. This will prepare you for the journey
+        ahead. I also explain the way the course is organized.
+      </p>
+
       <div className="d-flex w-100 justify-content-between ">
         <div
           className="mb-3 mt-3"

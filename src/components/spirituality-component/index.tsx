@@ -106,7 +106,12 @@ const SpiritualityComponent: React.FC<SpiritualityComponentProps> = ({
           </div>
         </div>
       </div>
-
+      <p>
+        In Module 5, we talk about the oneness and separateness of all. In the
+        seeming dichotomy, we find peace and learn to embrace our deepest
+        connection to ourselves. Spirituality explained through the lens of
+        science making it more tangible.
+      </p>
       <div className="d-flex w-100 justify-content-between ">
         <div
           className="mb-3 mt-3"

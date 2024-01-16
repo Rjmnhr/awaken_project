@@ -106,7 +106,11 @@ const HabitsComponent: React.FC<HabitsComponentProps> = ({
           </div>
         </div>
       </div>
-
+      <p>
+        In Module 2, we talk about the habits and patterns and actually lies
+        below the why we do the things we do. We also explore ways in which to
+        replace certain habits
+      </p>
       <div className="d-flex w-100 justify-content-between ">
         <div
           className="mb-3 mt-3"

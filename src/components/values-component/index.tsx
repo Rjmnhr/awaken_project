@@ -108,6 +108,12 @@ const ValuesComponent: React.FC<ValuesComponentProps> = ({
         </div>
       </div>
 
+      <p>
+        In Module 4, we uncover our values, which are the guide rails on our
+        journey. We identify the ones that are authentically ours and find ways
+        to live our lives according to them.
+      </p>
+
       <div className="d-flex w-100 justify-content-between ">
         <div
           className="mb-3 mt-3"

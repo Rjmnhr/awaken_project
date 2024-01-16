@@ -107,6 +107,12 @@ const ReviewComponent: React.FC<ReviewComponentProps> = ({
           </div>
         </div>
       </div>
+      <p>
+        During the review section, we now have a chance to go back to assessment
+        we did at the very beginning of the course and check our progress,
+        celebrate our success stories, and create action plans to achieve unmet
+        goals.
+      </p>
 
       <div className="d-flex w-100 justify-content-between ">
         <div

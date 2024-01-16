@@ -69,6 +69,7 @@ const OtpVerification: React.FC<OtpVerificationProps> = () => {
               </div>
               <p style={{ width: "80%" }}>
                 Please type in the <span>6-digit code</span>
+                {" "}
                 sent to your email. If it does not appear in your Inbox, please
                 check your Updates, Quarantined or Spam folders.
               </p>
@@ -91,11 +92,7 @@ const OtpVerification: React.FC<OtpVerificationProps> = () => {
                   {isLoading ? <LoadingOutlined /> : "Verify"}
                 </button>
               ) : (
-                <button
-                  disabled
-                  className="btn btn-primary "
-                  type="submit"
-                >
+                <button disabled className="btn btn-primary " type="submit">
                   {isLoading ? <LoadingOutlined /> : "Verify"}
                 </button>
               )}

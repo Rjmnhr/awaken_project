@@ -105,7 +105,11 @@ const BlocksComponent: React.FC<BlocksComponentProps> = ({
           </div>
         </div>
       </div>
-
+      <p>
+        In Module 3, we deep dive into blocks, fears and limiting beliefs and
+        how they are the obstacles on our way to happiness and joy. Through
+        powerful questioning we challenge them and eliminate them.
+      </p>
       <div className="d-flex w-100 justify-content-between ">
         <div
           className="mb-3 mt-3"
