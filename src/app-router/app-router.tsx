@@ -10,6 +10,7 @@ import CheckoutComponent from "../components/payment-checkout/Checkout";
 import ProductPurchasePage from "../pages/product-purchase";
 import Success from "../components/payment-checkout/Success";
 import PrivacyPolicy from "../pages/privacy-policy";
+import ForgotPasswordPage from "../pages/forgot-password-page";
 
 const AppRoute: React.FC = () => {
   return (
@@ -76,6 +77,14 @@ const AppRoute: React.FC = () => {
           element={
             <>
               <PrivacyPolicy />
+            </>
+          }
+        />
+        <Route
+          path="/forgot-password"
+          element={
+            <>
+              <ForgotPasswordPage />
             </>
           }
         />

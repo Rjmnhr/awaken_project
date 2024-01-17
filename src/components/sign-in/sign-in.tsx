@@ -37,7 +37,6 @@ const SignIn: React.FC = () => {
       });
 
       const data = await response.data;
-      console.log("🚀 ~ file: sign-in.tsx:40 ~ handleSubmit ~ data:", data)
 
       setIsLoading(false);
 
@@ -63,7 +62,7 @@ const SignIn: React.FC = () => {
       const accessToken = data.accessToken;
 
       const userName = data.first_name;
-const userEmail = data.email
+      const userEmail = data.email;
       localStorage.setItem("awaken-isLoggedIn", "true");
       localStorage.setItem("awaken-user-name", userName);
       localStorage.setItem("awaken-user-email", userEmail);
