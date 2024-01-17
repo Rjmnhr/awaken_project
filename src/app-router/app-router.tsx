@@ -9,6 +9,7 @@ import AccountPage from "../pages/account-page";
 import CheckoutComponent from "../components/payment-checkout/Checkout";
 import ProductPurchasePage from "../pages/product-purchase";
 import Success from "../components/payment-checkout/Success";
+import PrivacyPolicy from "../pages/privacy-policy";
 
 const AppRoute: React.FC = () => {
   return (
@@ -67,6 +68,14 @@ const AppRoute: React.FC = () => {
           element={
             <>
               <ProductPurchasePage />
+            </>
+          }
+        />
+        <Route
+          path="/privacy-policy"
+          element={
+            <>
+              <PrivacyPolicy />
             </>
           }
         />

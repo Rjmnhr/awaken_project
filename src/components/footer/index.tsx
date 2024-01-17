@@ -17,6 +17,9 @@ const Footer: React.FC = () => {
         <a href="https://www.ansuadutta.com/privacy-policy-1" target="blank">
           <button className="btn rounded-0 btn-dark">Imprint</button>
         </a>
+        <a href="/privacy-policy" target="blank">
+          <button className="btn rounded-0 btn-dark">Privacy Policy</button>
+        </a>
       </div>
     </footer>
   );

@@ -214,7 +214,10 @@ const SignUp: React.FC = () => {
                 ) : (
                   ""
                 )}
-
+                <p style={{fontSize:"14px"}}>
+                  By signing in to Awaken, I agree to the{" "}
+                  <a href="/privacy-policy">Privacy policy</a>
+                </p>
                 <div className="text-center">
                   <button
                     className="btn btn-primary  mb-3"
