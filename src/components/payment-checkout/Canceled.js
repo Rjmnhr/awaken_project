@@ -74,7 +74,7 @@ const Canceled = () => {
           </div>
 
           <button
-            onClick={() => navigate("/")}
+            onClick={() => navigate("https://www.ansuadutta.com/awaken")}
             style={{
               fontSize: "20px",
               margin: "10px",

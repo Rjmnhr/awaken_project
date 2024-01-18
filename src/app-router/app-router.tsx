@@ -104,6 +104,14 @@ const AppRoute: React.FC = () => {
             </>
           }
         />
+        <Route
+          path="/canceled.html"
+          element={
+            <>
+              <Success />
+            </>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
